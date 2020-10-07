@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>KRAS Annotation</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+	<link rel="stylesheet" href="/css/main.css">
+    <script src="/js/vendor.min.js"></script>
+    <script src="/js/showdown.min.js"></script>
+    <script src="/js/bionode-seq.min.js"></script>
+
+<style>
+    textarea {
+        font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+    }
+
+</style>
+</head>
+
+<body>
+    <center>
+    <h1><font color="Red"> Cas13 </font>: Tiling experiment guide RNA Target Design Server  <br> </h1>
+    <b> (ACADEMIC USE ONLY)<br><br> </b>
+    </center>
+    <center>
+    <p>
+
+    </p><form enctype="multipart/form-data" action="script.php" method="post">
+    <h2></h2><table border="0">
+
+    <tbody><tr>
+    <td align="left"> <strong>Input your RNA/DNA Sequence: </strong> </td>
+    </tr> 
+
+    <tr>
+    <td colspan="2">
+        <textarea name="fasta_sequence" id="fasta_sequence" rows="8" cols="120"></textarea>
+    </td>
+    </tr>
+
+    <tr>
+    <td align="center"> Spacer Length:</td>
+    <td align="left"> <input placeholder='30' type="TEXT" value="" name="F_primer" id="spacer_length" size="75"></td>
+    </tr>
+
+    <tr>
+    <td align="center"> Target Intervals:</td>
+    <td align="left"> <input placeholder='1' type="TEXT" value="" name="F_primer" id="intervals" size="75"></td>
+    </tr>
+
+    <tr>
+    <td align="center"> 5' Adapter:</td>
+    <td align="left"> <input type="TEXT" value="" name="F_primer" id="F_primer" size="75"></td>
+    </tr>
+
+    <tr>
+    <td align="center"> 3' Adapter:</td>
+    <td align="left"> <input type="TEXT" value="" name="R_primer" id="R_primer" size="75"></td>
+    </tr>
+
+<!-- 
+    <tr>
+    <td align="center"> E-mail address (optional):</td>
+    <td align="left"> <input type="TEXT" value="" name="REPLY-E-MAIL" size="40"></td>
+    </tr>
+-->
+
+    </tbody></table>
+    <input type="BUTTON" value="Show Example" onclick="show_example()">
+    <input type="SUBMIT" value="Submit" onclick="submit_sequence()">
+    <input type="RESET" value="Clear" onclick="clear_results()">
+    <input type="hidden" name="METHOD" value="Go!">
+
+    </form> 
+
+<div id='errors_div' style="display: none;">
+    <br>
+    <td align="left"> <strong style="color: red;">Errors: </strong></td>
+    <br>
+    <textarea id='errors' rows="8" cols="120"></textarea>
+</div>
+
+<div id='output_div' style="display: none;">
+    <br>
+    <td align="left"> <strong>Output: </strong> 
+        <br>
+    <a id="download_csv">Download as .txt file</a> </td>
+    <br>
+    <textarea id='output' rows="8" cols="120"></textarea>
+</div>
+
+<div id='stats_div' style="display: none;">
+    <br>
+    <td align="left"> <strong>Stats: </strong> </td>
+    <br>
+    <textarea id='stats' rows="8" cols="120"></textarea>
+</div>
+
+    <br>
+    <p>
+    <b><br>If you are using Cas13-gRNA server in your research, please cite:<br> </b>
+    XXXXX, (Under review).
+    <br>
+    <br>
+
+    </p>
+
+    <center>
+
+        <p></p>
+        <p> <font size="0.5"> Copyright @ 2020 Peter MacCallum Cancer Centre, Australia. </font></p>
+
+    </center>
+</center>
+
+
+<script type="text/javascript">
+const seq = require('bionode-seq');
+const md = new showdown.Converter({openLinksInNewWindow: true});
+
+
+// Display an example
+function show_example() {
+    $("#fasta_sequence").val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
+    $("#spacer_length").val(30);
+    $("#intervals").val(1);
+    $("#F_primer").val('cacc');
+    $("#R_primer").val('caac');
+}
+
+function clear_results() {
+    $("#errors_div").css("display", 'none');
+    $("#stats_div").css("display", 'none');
+    $("#output_div").css("display", 'none');
+}
+
+function submit_sequence() {
+    event.preventDefault();
+    console.log("hello");
+    $("#errors_div").css("display", 'none');
+    $("#stats_div").css("display", 'none');
+
+    $("#output_div").css("display", 'block');
+    var errors = [];
+
+    var sequence = $("#fasta_sequence").val().toUpperCase(),
+        F_primer = $("#F_primer").val().toLowerCase(),
+        R_primer = $("#R_primer").val().toLowerCase(),
+        spacer_length = parseInt($("#spacer_length").val()),
+        intervals = parseInt($("#intervals").val());
+
+    var outputs = [];
+    var pos = 0;
+    var count = 0;
+
+    if ($("#spacer_length").val() === '') spacer_length = 30;
+    if ($("#intervals").val() === '') intervals = 1;
+
+    if((!Number.isInteger(intervals) && $("#intervals").val() !== '') || intervals < 1 || parseInt($("#intervals").val()) === 0) {
+        var message = "Intervals must be an integer 1 or greater, setting 'intervals' to 1.";
+        errors.push(message);
+        intervals = 1;
+    }
+
+    if((!Number.isInteger(spacer_length) && $("#spacer_length").val() !== '') || spacer_length < 1 || parseInt($("#spacer_length").val()) === 0) {
+        var message = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
+        errors.push(message);
+        spacer_length = 1;
+    }
+
+
+    if(seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
+        console.log("Sequence is fine, no errors.");
+    } else {
+        var message = "Input sequence is not DNA or RNA";
+        errors.push(message);
+    }
+
+
+    while(pos < sequence.length) {
+        if(pos + spacer_length < sequence.length) {
+            count++;
+            var spacer = sequence.slice(pos, pos + spacer_length);
+            outputs.push(`gRNA_${count}_F ${F_primer}${seq.reverse(seq.complement(spacer))}`);
+            outputs.push(`gRNA_${count}_R ${R_primer}${spacer}`);
+        }
+        pos += intervals;
+    }
+
+
+    $("#output").val(outputs.join("\n"));
+
+    d3.select("#download_csv").attrs({
+        target: "_blank",
+        href: `data:text/plain;charset=utf-8,${encodeURIComponent(outputs.join("\n"))}`,
+        download: "results.txt"
+    });
+
+    if( spacer_length > sequence.length ) {
+        errors.push("Warning, spacer length is longer than sequence length.");
+    }
+
+// Print any errors
+    if(errors.length > 0) {
+        $("#errors_div").css("display", 'block');
+        $("#errors").val(errors.join("\n"));
+    }
+
+// Print stats
+    var stats = [];
+    stats.push(`Sequence length: ${sequence.length}`);
+    stats.push(`GC content: ${countGCcontent(sequence)}`);
+    stats.push(`Number of guide RNAs created: ${outputs.length}`);
+
+    $("#stats_div").css("display", 'block');
+    $("#stats").val(stats.join("\n"));
+}
+
+
+function countGCcontent(sequence) {
+    var total = sequence.length,
+        gc = 0;
+    sequence.split('').forEach(char => {
+        if(char == 'c' || char == 'C' || char == 'g' | char == 'G') gc++;
+    });
+    return Math.floor((100 * gc)/total)+'%';
+}
+
+
+
+</script>
+
+</body>
+
+</html>
