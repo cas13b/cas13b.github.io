@@ -18,6 +18,21 @@
         font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
     }
 
+    td#advancedOptionsButton {
+        text-align: center;
+        line-height: 2em;
+    }
+    tr#advancedOptions.hidden {
+        display: none;
+    }
+    tr#advancedOptions td div.option {
+        padding: 0 10px;
+        width: 25%;
+        float: left;
+    }
+    div#outputs {
+        margin: auto;
+    }
 </style>
 </head>
 
@@ -32,34 +47,35 @@
     </p><form enctype="multipart/form-data" action="script.php" method="post">
     <h2></h2><table border="0">
 
-    <tbody><tr>
-    <td align="left"> <strong>Input your RNA/DNA Sequence: </strong> </td>
+    <tbody>
+    <tr>
+        <td align="left" colspan="2"><strong>Input your RNA/DNA Sequence:</strong></td>
     </tr> 
 
     <tr>
-    <td colspan="2">
-        <textarea name="fasta_sequence" id="fasta_sequence" rows="8" cols="120"></textarea>
-    </td>
+        <td colspan="2">
+            <textarea name="fasta_sequence" id="fasta_sequence" rows="8" cols="100"></textarea>
+        </td>
     </tr>
 
     <tr>
-    <td align="center"> Spacer Length:</td>
-    <td align="left"> <input placeholder='30' type="TEXT" value="" name="F_primer" id="spacer_length" size="75"></td>
+        <td align="center">Spacer Length:</td>
+        <td align="left"><input placeholder='30' type="TEXT" value="" name="F_primer" id="spacer_length" size="75"></td>
     </tr>
 
     <tr>
-    <td align="center"> Target Intervals:</td>
-    <td align="left"> <input placeholder='1' type="TEXT" value="" name="F_primer" id="intervals" size="75"></td>
+        <td align="center">Target Intervals:</td>
+        <td align="left"><input placeholder='1' type="TEXT" value="" name="F_primer" id="intervals" size="75"></td>
     </tr>
 
     <tr>
-    <td align="center"> 5' Adapter:</td>
-    <td align="left"> <input type="TEXT" value="" name="F_primer" id="F_primer" size="75"></td>
+        <td align="center">5' Oligo Adapter:</td>
+        <td align="left"><input type="TEXT" value="" name="F_primer" id="F_primer" size="75"></td>
     </tr>
 
     <tr>
-    <td align="center"> 3' Adapter:</td>
-    <td align="left"> <input type="TEXT" value="" name="R_primer" id="R_primer" size="75"></td>
+        <td align="center">3' Oligo Adapter:</td>
+        <td align="left"><input type="TEXT" value="" name="R_primer" id="R_primer" size="75"></td>
     </tr>
 
 <!-- 
@@ -69,6 +85,48 @@
     </tr>
 -->
 
+<tr>
+    <td id="advancedOptionsButton" colspan="2"><a href="#" onclick="$('#advancedOptions').toggleClass('hidden')">Advanced Options</a></td>
+</tr>
+
+<tr id='advancedOptions'>
+    <td colspan="2">
+        <!-- Make forward or reverse optional -->
+        <div class='option'>
+            <input type="checkbox" id="showForward" name="showForward" value="showForward" checked="true">
+            <label for="showForward">Forward Strand</label><br>
+            <input type="checkbox" id="showReverse" name="showReverse" value="showReverse" checked="true">
+            <label for="showReverse">Reverse Strand</label><br>
+        </div>
+
+        <div class='option'>
+            <input type="radio" id="classic_radio" name="format" value="classic" checked="true">
+            <label for="classic_radio">Classic format</label><br>
+            <input type="radio" id="fasta_radio" name="format" value="fasta">
+            <label for="fasta_radio">Fasta format</label><br>
+
+        </div>
+
+        <div class='option' style="width: 35%;">
+            <input type="radio" id="collate_radio" name="lines" value="collate" checked="true">
+            <label for="collate_radio">Collate forward and reverse primers </label><br>
+            <input type="radio" id="separate_radio" name="lines" value="separate">
+            <label for="separate_radio">Forward primers, then reverse primers</label><br>
+            <input type="radio" id="double_radio" name="lines" value="double">
+            <label for="double_radio">Both primers on the same line</label><br>
+            <input type="radio" id="files_radio" name="lines" value="files">
+            <label for="files_radio">Separate files</label><br>
+        </div>
+
+        <div class='option' style="width: 15%;">
+            <input type="radio" id="tabs_radio" name="separator" value="tabs" checked="true">
+            <label for="tabs_radio">Tabs</label><br>
+            <input type="radio" id="spaces_radio" name="separator" value="spaces">
+            <label for="spaces_radio">Spaces</label><br>
+        </div>
+    </td>
+</tr>
+
     </tbody></table>
     <input type="BUTTON" value="Show Example" onclick="show_example()">
     <input type="SUBMIT" value="Submit" onclick="submit_sequence()">
@@ -76,30 +134,30 @@
     <input type="hidden" name="METHOD" value="Go!">
 
     </form> 
-
-<div id='errors_div' style="display: none;">
-    <br>
-    <td align="left"> <strong style="color: red;">Errors: </strong></td>
-    <br>
-    <textarea id='errors' rows="8" cols="120"></textarea>
-</div>
-
-<div id='output_div' style="display: none;">
-    <br>
-    <td align="left"> <strong>Output: </strong> 
+<div id="outputs">
+    <div id='errors_div' style="display: none;">
         <br>
-    <a id="download_csv">Download as .txt file</a> </td>
-    <br>
-    <textarea id='output' rows="8" cols="120"></textarea>
-</div>
+        <td align="left"> <strong style="color: red;">Errors: </strong></td>
+        <br>
+        <textarea id='errors' rows="8" cols="100"></textarea>
+    </div>
 
-<div id='stats_div' style="display: none;">
-    <br>
-    <td align="left"> <strong>Stats: </strong> </td>
-    <br>
-    <textarea id='stats' rows="8" cols="120"></textarea>
-</div>
+    <div id='output_div' style="display: none;">
+        <br>
+        <td align="left"> <strong>Output: </strong> 
+            <br>
+        <a id="download_csv">Download as .txt file</a> </td>
+        <br>
+        <textarea id='output' rows="8" cols="100"></textarea>
+    </div>
 
+    <div id='stats_div' style="display: none;">
+        <br>
+        <td align="left"> <strong>Stats: </strong> </td>
+        <br>
+        <textarea id='stats' rows="8" cols="100"></textarea>
+    </div>
+</div>
     <br>
     <p>
     <b><br>If you are using Cas13-gRNA server in your research, please cite:<br> </b>
