@@ -33,6 +33,9 @@
     div#outputs {
         margin: auto;
     }
+    #advancedOptions label, #advancedOptions input {
+        cursor: pointer;
+    }
 </style>
 </head>
 
@@ -93,9 +96,11 @@
     <td colspan="2">
         <!-- Make forward or reverse optional -->
         <div class='option'>
-            <input type="checkbox" id="showForward" name="showForward" value="showForward" checked="true">
+            <input type="radio" id="showBoth" name="strands_shown" value="both" checked="true">
+            <label for="showBoth">Show both</label><br>
+            <input type="radio" id="showForward" name="strands_shown" value="forward">
             <label for="showForward">Forward Strand</label><br>
-            <input type="checkbox" id="showReverse" name="showReverse" value="showReverse" checked="true">
+            <input type="radio" id="showReverse" name="strands_shown" value="reverse">
             <label for="showReverse">Reverse Strand</label><br>
         </div>
 
@@ -119,10 +124,10 @@
         </div>
 
         <div class='option' style="width: 15%;">
-            <input type="radio" id="tabs_radio" name="separator" value="tabs" checked="true">
-            <label for="tabs_radio">Tabs</label><br>
-            <input type="radio" id="spaces_radio" name="separator" value="spaces">
+            <input type="radio" id="spaces_radio" name="separator" value="spaces" checked="true">
             <label for="spaces_radio">Spaces</label><br>
+            <input type="radio" id="tabs_radio" name="separator" value="tabs">
+            <label for="tabs_radio">Tabs</label><br>
         </div>
     </td>
 </tr>
@@ -149,6 +154,15 @@
         <a id="download_csv">Download as .txt file</a> </td>
         <br>
         <textarea id='output' rows="8" cols="100"></textarea>
+    </div>
+
+    <div id='extra_output_div' style="display: none;">
+        <br>
+        <td align="left"> <strong>Reverse Output: </strong> 
+            <br>
+        <a id="download_extra_csv">Download as .txt file</a> </td>
+        <br>
+        <textarea id='extra_output' rows="8" cols="100"></textarea>
     </div>
 
     <div id='stats_div' style="display: none;">
@@ -196,15 +210,39 @@ function clear_results() {
     $("#output_div").css("display", 'none');
 }
 
+function getOptions() {
+    var data = $("form").serializeArray()
+        .reduce( (result, val) => {
+            result[val.name] = val.value;
+            return result;
+        }, {});
+
+    var options = {
+        strands_shown: data.strands_shown,
+        format: data.format,
+        lines: data.lines,
+        separator: data.separator
+    };
+
+    return options;
+}
+
 function submit_sequence() {
     event.preventDefault();
-    console.log("hello");
+
+    var options = getOptions();
+
     $("#errors_div").css("display", 'none');
     $("#stats_div").css("display", 'none');
-
     $("#output_div").css("display", 'block');
+    $("#extra_output_div").css("display", "none");
     var errors = [];
 
+
+
+
+
+// Calculate sequences
     var sequence = $("#fasta_sequence").val().toUpperCase(),
         F_primer = $("#F_primer").val().toLowerCase(),
         R_primer = $("#R_primer").val().toLowerCase(),
@@ -212,8 +250,9 @@ function submit_sequence() {
         intervals = parseInt($("#intervals").val());
 
     var outputs = [];
+    var forward_seq = [];
+    var reverse_seq = []
     var pos = 0;
-    var count = 0;
 
     if ($("#spacer_length").val() === '') spacer_length = 30;
     if ($("#intervals").val() === '') intervals = 1;
@@ -230,7 +269,6 @@ function submit_sequence() {
         spacer_length = 1;
     }
 
-
     if(seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
         console.log("Sequence is fine, no errors.");
     } else {
@@ -238,24 +276,69 @@ function submit_sequence() {
         errors.push(message);
     }
 
-
     while(pos < sequence.length) {
         if(pos + spacer_length < sequence.length) {
-            count++;
-            var spacer = sequence.slice(pos, pos + spacer_length);
-            outputs.push(`gRNA_${count}_F ${F_primer}${seq.reverse(seq.complement(spacer))}`);
-            outputs.push(`gRNA_${count}_R ${R_primer}${spacer}`);
+            var match = sequence.slice(pos, pos + spacer_length);
+            forward_seq.push(`${F_primer}${seq.reverse(seq.complement(match))}`);
+            reverse_seq.push(`${R_primer}${match}`);
         }
         pos += intervals;
     }
 
 
-    $("#output").val(outputs.join("\n"));
 
+// Apply options
+    var separator = options.separator == "tabs" ? "\t" : " ";
+
+    if (options.format == 'fasta') {
+        forward_seq = forward_seq.map( (d, i) => `>gRNA_${i+1}_F\n${d.replace(/.{80}/g, "$0\n")}`);
+        reverse_seq = reverse_seq.map( (d, i) => `>gRNA_${i+1}_R\n${d.replace(/.{80}/g, "$0\n")}`);
+    } else {
+        forward_seq = forward_seq.map( (d, i) => `gRNA_${i+1}_F${separator}${d}`);
+        reverse_seq = reverse_seq.map( (d, i) => `gRNA_${i+1}_R${separator}${d}`);
+    }
+
+    if (options.lines == 'collate') {
+        for(var i = 0; i < forward_seq.length; i++) {
+            outputs.push(forward_seq[i]);
+            outputs.push(reverse_seq[i]);
+        }
+    } else if (options.lines == 'separate') {
+        outputs = forward_seq.concat(reverse_seq);
+    } else if (options.lines == 'double') {
+        for(var i = 0; i < forward_seq.length; i++) {
+            outputs.push(forward_seq[i] + separator + reverse_seq[i]);
+        }
+    }
+
+
+// Print output
+    if (options.strands_shown == 'forward') {
+        $("#output").val(forward_seq.join("\n"));
+    } else if (options.strands_shown == 'reverse') {
+        $("#output").val(reverse_seq.join("\n"));
+    } else {
+        if (options.lines != 'files') {
+            $("#output").val(outputs.join("\n"));
+        } else {
+            $("#output").val(forward_seq.join("\n"));
+            $("#extra_output_div").css("display", "block");
+            $("#extra_output").val(reverse_seq.join("\n"));
+        }
+    }
+
+
+// Make output downloadable
     d3.select("#download_csv").attrs({
         target: "_blank",
-        href: `data:text/plain;charset=utf-8,${encodeURIComponent(outputs.join("\n"))}`,
+        href: `data:text/plain;charset=utf-8,${encodeURIComponent($("#output").val())}`,
         download: "results.txt"
+    });
+
+    d3.select("#download_extra_csv").attrs({
+        target: "_blank",
+        href: `data:text/plain;charset=utf-8,${encodeURIComponent($("#extra_output").val())}`,
+        download: "results_2.txt"
     });
 
     if( spacer_length > sequence.length ) {
@@ -272,7 +355,7 @@ function submit_sequence() {
     var stats = [];
     stats.push(`Sequence length: ${sequence.length}`);
     stats.push(`GC content: ${countGCcontent(sequence)}`);
-    stats.push(`Number of guide RNAs created: ${outputs.length}`);
+    stats.push(`Number of guide RNAs created: ${outputs.length}`); // TODO: Fix for use case when only forward/reverse is generated
 
     $("#stats_div").css("display", 'block');
     $("#stats").val(stats.join("\n"));
