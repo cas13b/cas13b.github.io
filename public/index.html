@@ -33,9 +33,6 @@
     div#outputs {
         margin: auto;
     }
-    #advancedOptions label, #advancedOptions input {
-        cursor: pointer;
-    }
 
     div#outputs.double div#output_div {
         float: left;
@@ -61,6 +58,18 @@
     }
     div#outputs p {
         margin: 0;
+    }
+
+    #advancedOptions label, #advancedOptions input {
+        cursor: pointer;
+    }
+
+    #advancedOptions input[disabled] {
+        cursor: not-allowed;
+    }
+    #advancedOptions input[disabled] + label {
+        text-decoration: line-through;
+        cursor: not-allowed;
     }
 </style>
 </head>
@@ -114,7 +123,7 @@
 -->
 
 <tr>
-    <td id="advancedOptionsButton" colspan="2"><a href="#" onclick="$('#advancedOptions').toggleClass('hidden')">Advanced Options</a></td>
+    <td id="advancedOptionsButton" colspan="2"><a href="#advanced" onclick="$('#advancedOptions').toggleClass('hidden')">Advanced Options</a></td>
 </tr>
 
 <tr id='advancedOptions' class='hidden'>
@@ -174,13 +183,13 @@
 
     <div id='output_div' style="display: none;">
         <h2>Output:</h2> 
-        <p><a id="download_csv">Download as .txt file</a></p>
+        <p><a id="download_csv" onclick="update_data('#download_csv', '#output')" target="_blank" href="#results.txt" download="results.txt">Download as .txt file</a></p>
         <textarea id='output' rows="8" cols="100"></textarea>
     </div>
 
     <div id='extra_output_div' style="display: none;">
         <h2>Reverse Output:</h2> 
-        <p><a id="download_extra_csv">Download as .txt file</a></p>
+        <p><a id="download_extra_csv" onclick="update_data('#download_extra_csv', '#extra_output')" target="_blank" href="#reverse.txt" download="reverse.txt">Download as .txt file</a></p>
         <textarea id='extra_output' rows="8" cols="100"></textarea>
     </div>
 
@@ -189,20 +198,16 @@
         <textarea id='stats' rows="8" cols="100"></textarea>
     </div>
 </div>
-    <br>
-    <p>
-    <b><br>If you are using Cas13-gRNA server in your research, please cite:<br> </b>
-    XXXXX, (Under review).
-    <br>
-    <br>
 
-    </p>
+<br>
+<p>
+<b>If you are using Cas13-gRNA server in your research, please cite:</b>
+<br>
+XXXXX, (Under review).
+</p>
 
     <center>
-
-        <p></p>
         <p> <font size="0.5"> Copyright @ 2020 Peter MacCallum Cancer Centre, Australia. </font></p>
-
     </center>
 </center>
 
@@ -350,20 +355,6 @@ function submit_sequence() {
         }
     }
 
-
-// Make output downloadable
-    d3.select("#download_csv").attrs({
-        target: "_blank",
-        href: `data:text/plain;charset=utf-8,${encodeURIComponent($("#output").val())}`,
-        download: "results.txt"
-    });
-
-    d3.select("#download_extra_csv").attrs({
-        target: "_blank",
-        href: `data:text/plain;charset=utf-8,${encodeURIComponent($("#extra_output").val())}`,
-        download: "results_2.txt"
-    });
-
     if( spacer_length > sequence.length ) {
         errors.push("Warning, spacer length is longer than sequence length.");
     }
@@ -384,6 +375,9 @@ function submit_sequence() {
     $("#stats").val(stats.join("\n"));
 }
 
+function update_data(link, data) {
+    $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent($(data).val())}`);
+}
 
 function countGCcontent(sequence) {
     var total = sequence.length,
@@ -394,7 +388,9 @@ function countGCcontent(sequence) {
     return Math.floor((100 * gc)/total)+'%';
 }
 
-
+if(location.hash == "#advanced") {
+    $("#advancedOptions").removeClass("hidden");
+}
 
 </script>
 
