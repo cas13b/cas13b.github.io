@@ -237,6 +237,10 @@ function clear_results() {
     $('textarea#output').val("");
     $('textarea#extra_output').val("");
     $('textarea#stats').val("");
+
+    setTimeout(function(){
+        updateDisabledOptions();
+    }, 50);
 }
 
 function getOptions() {
@@ -386,6 +390,37 @@ function countGCcontent(sequence) {
         if(char == 'c' || char == 'C' || char == 'g' | char == 'G') gc++;
     });
     return Math.floor((100 * gc)/total)+'%';
+}
+
+$("#advancedOptions input").change(() => {
+    updateDisabledOptions();
+    if($("#fasta_sequence").val() && $("#output").val()) submit_sequence();
+});
+
+function updateDisabledOptions(){
+    const options = getOptions();
+
+    if(options.strands_shown == 'both') {
+        $("input[name='lines']").prop('disabled', false);
+
+        if(options.format == 'fasta') {
+            $("#double_radio").prop('disabled', true);
+
+            if($("#double_radio").prop('checked')) {
+                $("#collate_radio").prop('checked', true);
+            }
+        } else {
+            $("#double_radio").prop('disabled', false);
+        }
+    } else {
+        $("input[name='lines']").prop('disabled', true);
+    }
+
+    if(options.format == 'classic') {
+        $("input[name='separator']").prop('disabled', false);
+    } else {
+        $("input[name='separator']").prop('disabled', true);
+    }
 }
 
 if(location.hash == "#advanced") {
