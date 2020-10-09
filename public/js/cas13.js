@@ -74,10 +74,10 @@
         R_primer = `${$("#R_primer").val()}`.toLowerCase(),
         spacer_length = parseInt(`${$("#spacer_length").val()}`),
         intervals = parseInt(`${$("#intervals").val()}`);
-    var outputs = [];
-    var forward_seq = [];
-    var reverse_seq = [];
-    var pos = 0;
+    let outputs = [];
+    let forward_seq = [];
+    let reverse_seq = [];
+    let pos = 0;
     if ($("#spacer_length").val() === '') spacer_length = 30;
     if ($("#intervals").val() === '') intervals = 1;
 
@@ -235,7 +235,7 @@
   function drawChart() {
     console.log("Drawing chart");
     let rawData = d3.select("#output").datum();
-    var data = [];
+    let data = [];
     data = data.concat(rawData.forward_seq.map((d, i) => {
       return {
         x: i,
@@ -255,14 +255,14 @@
       };
     })); // set the dimensions and margins of the graph
 
-    var margin = {
+    const margin = {
       top: 10,
       right: 30,
       bottom: 40,
       left: 50
     },
-        width = 900 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+          width = 900 - margin.left - margin.right,
+          height = 600 - margin.top - margin.bottom;
     d3.select("#chart g").remove(); // append the svg object to the body of the page
 
     var svg = d3.select("#chart").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")"); // Add the grey background that makes ggplot2 famous
@@ -344,7 +344,7 @@
     });
   }
 
-  $(document).keydown(function (e) {
+  $(document).on("keypress", function (e) {
     // ESCAPE key pressed
     if (e.keyCode == 27) {
       d3.select("#chart-tooltip").style("display", "none");

@@ -6,6 +6,19 @@ declare module "jquery" {
     export = $;
 }
 
+interface gRNA {
+    x: number;
+    label: string;
+    seq: string;
+    gc: number;
+    type: string;
+}
+
+interface calculatedSequences {
+    forward_seq: string[];
+    reverse_seq: string[];
+}
+
 // Display an example
 globalThis.show_example = show_example;
 function show_example() {
@@ -69,10 +82,10 @@ function submit_sequence() {
         spacer_length = parseInt(`${$("#spacer_length").val()}`),
         intervals = parseInt(`${$("#intervals").val()}`);
 
-    var outputs = [];
-    var forward_seq = [];
-    var reverse_seq = [];
-    var pos = 0;
+    let outputs : string[] = [];
+    let forward_seq : string[] = [];
+    let reverse_seq : string[] = [];
+    let pos : number = 0;
 
     if ($("#spacer_length").val() === '') spacer_length = 30;
     if ($("#intervals").val() === '') intervals = 1;
@@ -109,7 +122,7 @@ function submit_sequence() {
     d3.select("#output").datum({
         forward_seq: forward_seq,
         reverse_seq: reverse_seq
-    });
+    } as calculatedSequences);
     drawChart();
 
 // Apply options
@@ -233,8 +246,8 @@ if(window.location.hash == "#advanced") {
 function drawChart() {
     console.log("Drawing chart");
 
-    let rawData : any = d3.select("#output").datum();
-    var data = [];
+    let rawData : calculatedSequences = d3.select("#output").datum() as calculatedSequences;
+    let data : gRNA[] = [];
     data = data.concat(rawData.forward_seq.map((d, i) => {
         return {
             x: i,
@@ -256,7 +269,7 @@ function drawChart() {
     }));
 
     // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 40, left: 50},
+    const margin = {top: 10, right: 30, bottom: 40, left: 50},
         width = 900 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
@@ -393,7 +406,7 @@ function drawChart() {
         });
 }
 
-$(document).keydown(function(e) {
+$(document).on("keypress", function(e) {
     // ESCAPE key pressed
     if (e.keyCode == 27) {
         d3.select("#chart-tooltip").style("display", "none");
