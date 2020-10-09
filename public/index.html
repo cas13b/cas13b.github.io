@@ -559,13 +559,24 @@ function drawChart() {
         .style("fill", function (d) { return color(d.type) } )
         .on("mouseover", d => {
             tooltip.style("display", "block");
-            tooltip.attr("transform", `translate(${x(d.x) + 10}, ${y(d.gc) - 50})`);
             title.text(d.label);
             sequence.text(d.seq);
             gcContent.text(`GC: ${d.gc}%`);
-            // console.log($(sequence).width());
-            background.attr('width', sequence.node().getBBox().width + 20);
-            closeButton.attr('x', sequence.node().getBBox().width + 5);
+
+            var textWidth = sequence.node().getBBox().width;
+            background.attr('width', textWidth + 20);
+            closeButton.attr('x', textWidth + 5);
+
+            var tooltipX = x(d.x) + 5;
+            if(tooltipX + textWidth > width) {
+                tooltipX = width - textWidth;
+            }
+            var tooltipY = y(d.gc) - 75;
+            if (tooltipY < 0) {
+                tooltipY = y(d.gc) + 5;
+            }
+            tooltip.attr("transform", `translate(${tooltipX}, ${tooltipY})`);
+
         });
 
     // Add label
