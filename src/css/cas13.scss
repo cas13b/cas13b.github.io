@@ -1,0 +1,71 @@
+
+textarea {
+    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+}
+
+td#advancedOptionsButton {
+    text-align: center;
+    line-height: 2em;
+}
+tr#advancedOptions.hidden {
+    display: none;
+}
+tr#advancedOptions td div.option {
+    padding: 0 10px;
+    width: 25%;
+    float: left;
+}
+
+
+
+div#outputs {
+    p {
+        margin: 0;
+    }
+    margin: auto;
+    &.double {
+        div#output_div {
+            float: left;
+            width: 50%;
+            padding: 0 5px;
+            textarea {
+                width: 100%;
+            }
+        }
+        div#extra_output_div {
+            float: left;
+            width: 50%;
+            padding: 0 5px;
+            textarea {
+                width: 100%;
+            }
+        }
+    }
+}
+
+
+
+h2 {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5em;
+    margin: 0;
+}
+
+#advancedOptions label, #advancedOptions input {
+    cursor: pointer;
+}
+
+#advancedOptions input[disabled] {
+    cursor: not-allowed;
+}
+#advancedOptions input[disabled] + label {
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+#chart_div {
+    width: 900px;
+    margin: auto;
+    text-align: center;
+}
