@@ -5,58 +5,6 @@ textarea {
 }
 
 /* line 6, websites/cas13/src/css/cas13.scss */
-td#advancedOptionsButton {
-  text-align: center;
-  line-height: 2em;
-}
-
-/* line 10, websites/cas13/src/css/cas13.scss */
-tr#advancedOptions.hidden {
-  display: none;
-}
-
-/* line 13, websites/cas13/src/css/cas13.scss */
-tr#advancedOptions td div.option {
-  padding: 0 10px;
-  width: 25%;
-  float: left;
-}
-
-/* line 21, websites/cas13/src/css/cas13.scss */
-div#outputs {
-  margin: auto;
-}
-
-/* line 22, websites/cas13/src/css/cas13.scss */
-div#outputs p {
-  margin: 0;
-}
-
-/* line 27, websites/cas13/src/css/cas13.scss */
-div#outputs.double div#output_div {
-  float: left;
-  width: 50%;
-  padding: 0 5px;
-}
-
-/* line 31, websites/cas13/src/css/cas13.scss */
-div#outputs.double div#output_div textarea {
-  width: 100%;
-}
-
-/* line 35, websites/cas13/src/css/cas13.scss */
-div#outputs.double div#extra_output_div {
-  float: left;
-  width: 50%;
-  padding: 0 5px;
-}
-
-/* line 39, websites/cas13/src/css/cas13.scss */
-div#outputs.double div#extra_output_div textarea {
-  width: 100%;
-}
-
-/* line 48, websites/cas13/src/css/cas13.scss */
 h2 {
   font-size: 16px;
   font-weight: 700;
@@ -64,23 +12,75 @@ h2 {
   margin: 0;
 }
 
-/* line 55, websites/cas13/src/css/cas13.scss */
-#advancedOptions label, #advancedOptions input {
+/* line 13, websites/cas13/src/css/cas13.scss */
+td#advancedOptionsButton {
+  text-align: center;
+  line-height: 2em;
+}
+
+/* line 19, websites/cas13/src/css/cas13.scss */
+tr#advancedOptions label, tr#advancedOptions input {
   cursor: pointer;
 }
 
-/* line 59, websites/cas13/src/css/cas13.scss */
-#advancedOptions input[disabled] {
+/* line 22, websites/cas13/src/css/cas13.scss */
+tr#advancedOptions input[disabled] {
   cursor: not-allowed;
 }
 
-/* line 62, websites/cas13/src/css/cas13.scss */
-#advancedOptions input[disabled] + label {
+/* line 24, websites/cas13/src/css/cas13.scss */
+tr#advancedOptions input[disabled] + label {
   text-decoration: line-through;
   cursor: not-allowed;
 }
 
-/* line 67, websites/cas13/src/css/cas13.scss */
+/* line 29, websites/cas13/src/css/cas13.scss */
+tr#advancedOptions.hidden {
+  display: none;
+}
+
+/* line 32, websites/cas13/src/css/cas13.scss */
+tr#advancedOptions td div.option {
+  padding: 0 10px;
+  width: 25%;
+  float: left;
+}
+
+/* line 40, websites/cas13/src/css/cas13.scss */
+div#outputs {
+  margin: auto;
+}
+
+/* line 41, websites/cas13/src/css/cas13.scss */
+div#outputs p {
+  margin: 0;
+}
+
+/* line 46, websites/cas13/src/css/cas13.scss */
+div#outputs.double div#output_div {
+  float: left;
+  width: 50%;
+  padding: 0 5px;
+}
+
+/* line 50, websites/cas13/src/css/cas13.scss */
+div#outputs.double div#output_div textarea {
+  width: 100%;
+}
+
+/* line 54, websites/cas13/src/css/cas13.scss */
+div#outputs.double div#extra_output_div {
+  float: left;
+  width: 50%;
+  padding: 0 5px;
+}
+
+/* line 58, websites/cas13/src/css/cas13.scss */
+div#outputs.double div#extra_output_div textarea {
+  width: 100%;
+}
+
+/* line 65, websites/cas13/src/css/cas13.scss */
 #chart_div {
   width: 900px;
   margin: auto;
