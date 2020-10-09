@@ -226,6 +226,12 @@ function clear_results() {
     $("#stats_div").css("display", 'none');
     $("#output_div").css("display", 'none');
     $("#extra_output_div").css("display", 'none');
+
+    $("#outputs").removeClass("double");
+    $('textarea#errors').val("");
+    $('textarea#output').val("");
+    $('textarea#extra_output').val("");
+    $('textarea#stats').val("");
 }
 
 function getOptions() {
@@ -248,12 +254,10 @@ function getOptions() {
 function submit_sequence() {
     event.preventDefault();
 
-    var options = getOptions();
-
-    $("#errors_div").css("display", 'none');
-    $("#stats_div").css("display", 'none');
+    clear_results();
     $("#output_div").css("display", 'block');
-    $("#extra_output_div").css("display", "none");
+
+    var options = getOptions();
     var errors = [];
 
 
