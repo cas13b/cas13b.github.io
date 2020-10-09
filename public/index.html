@@ -36,23 +36,48 @@
     #advancedOptions label, #advancedOptions input {
         cursor: pointer;
     }
+
+    div#outputs.double div#output_div {
+        float: left;
+        width: 50%;
+        padding: 0 5px;
+    }
+    div#outputs.double div#output_div textarea {
+        width: 100%;
+    }
+    div#outputs.double div#extra_output_div {
+        float: left;
+        width: 50%;
+        padding: 0 5px;
+    }
+    div#outputs.double div#extra_output_div textarea {
+        width: 100%;
+    }
+    h2 {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.5em;
+        margin: 0;
+    }
+    div#outputs p {
+        margin: 0;
+    }
 </style>
 </head>
 
 <body>
     <center>
-    <h1><font color="Red"> Cas13 </font>: Tiling experiment guide RNA Target Design Server  <br> </h1>
-    <b> (ACADEMIC USE ONLY)<br><br> </b>
+    <h1><font color="Red"> Cas13 </font>: Tiling experiment guide RNA Target Design Server</h1>
+    <b>(ACADEMIC USE ONLY)</b>
     </center>
-    <center>
-    <p>
 
-    </p><form enctype="multipart/form-data" action="script.php" method="post">
-    <h2></h2><table border="0">
+    <center>
+    <form enctype="multipart/form-data">
+    <table>
 
     <tbody>
     <tr>
-        <td align="left" colspan="2"><strong>Input your RNA/DNA Sequence:</strong></td>
+        <td align="left" colspan="2"><h2>Input your RNA/DNA Sequence:</h2></td>
     </tr> 
 
     <tr>
@@ -92,7 +117,7 @@
     <td id="advancedOptionsButton" colspan="2"><a href="#" onclick="$('#advancedOptions').toggleClass('hidden')">Advanced Options</a></td>
 </tr>
 
-<tr id='advancedOptions'>
+<tr id='advancedOptions' class='hidden'>
     <td colspan="2">
         <!-- Make forward or reverse optional -->
         <div class='option'>
@@ -138,37 +163,29 @@
     <input type="RESET" value="Clear" onclick="clear_results()">
     <input type="hidden" name="METHOD" value="Go!">
 
-    </form> 
+</form>
+
+
 <div id="outputs">
     <div id='errors_div' style="display: none;">
-        <br>
-        <td align="left"> <strong style="color: red;">Errors: </strong></td>
-        <br>
+        <h2 style="color: red;">Errors:</h2>
         <textarea id='errors' rows="8" cols="100"></textarea>
     </div>
 
     <div id='output_div' style="display: none;">
-        <br>
-        <td align="left"> <strong>Output: </strong> 
-            <br>
-        <a id="download_csv">Download as .txt file</a> </td>
-        <br>
+        <h2>Output:</h2> 
+        <p><a id="download_csv">Download as .txt file</a></p>
         <textarea id='output' rows="8" cols="100"></textarea>
     </div>
 
     <div id='extra_output_div' style="display: none;">
-        <br>
-        <td align="left"> <strong>Reverse Output: </strong> 
-            <br>
-        <a id="download_extra_csv">Download as .txt file</a> </td>
-        <br>
+        <h2>Reverse Output:</h2> 
+        <p><a id="download_extra_csv">Download as .txt file</a></p>
         <textarea id='extra_output' rows="8" cols="100"></textarea>
     </div>
 
     <div id='stats_div' style="display: none;">
-        <br>
-        <td align="left"> <strong>Stats: </strong> </td>
-        <br>
+        <h2>Stats:</h2>
         <textarea id='stats' rows="8" cols="100"></textarea>
     </div>
 </div>
@@ -208,6 +225,7 @@ function clear_results() {
     $("#errors_div").css("display", 'none');
     $("#stats_div").css("display", 'none');
     $("#output_div").css("display", 'none');
+    $("#extra_output_div").css("display", 'none');
 }
 
 function getOptions() {
@@ -322,6 +340,7 @@ function submit_sequence() {
             $("#output").val(outputs.join("\n"));
         } else {
             $("#output").val(forward_seq.join("\n"));
+            $("#outputs").addClass("double");
             $("#extra_output_div").css("display", "block");
             $("#extra_output").val(reverse_seq.join("\n"));
         }
