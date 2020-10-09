@@ -544,7 +544,7 @@ function drawChart() {
         .range([ "#F8766D", "#00BA38", "#619CFF"])
 
 
-    var tooltip, title, sequence, gcContent;
+    var tooltip, background, closeButton, title, sequence, gcContent;
 
     // Add dots
     svg.append('g')
@@ -563,6 +563,9 @@ function drawChart() {
             title.text(d.label);
             sequence.text(d.seq);
             gcContent.text(`GC: ${d.gc}%`);
+            // console.log($(sequence).width());
+            background.attr('width', sequence.node().getBBox().width + 20);
+            closeButton.attr('x', sequence.node().getBBox().width + 5);
         });
 
     // Add label
@@ -571,7 +574,7 @@ function drawChart() {
         .attrs({
             id: "chart-tooltip"
         });
-    tooltip.append("rect")
+    background = tooltip.append("rect")
         .attrs({
             width: '370px',
             height: '70px',
@@ -579,9 +582,9 @@ function drawChart() {
             stroke: "black",
             rx: '5px'
         });
-    tooltip.append("text").text("X").attrs({
+    closeButton = tooltip.append("text").text("X").attrs({
         x: 355,
-        y: 15,
+        y: 18,
         'font-weight': 700
     }).style("cursor", "pointer")
     .on('click', () => {tooltip.style("display", "none")});
