@@ -617,6 +617,13 @@ function drawChart() {
         });
 }
 
+$(document).keydown(function(e) {
+    // ESCAPE key pressed
+    if (e.keyCode == 27) {
+        d3.select("#chart-tooltip").style("display", "none");
+    }
+});
+
 </script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-76178877-2"></script>
