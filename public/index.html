@@ -373,7 +373,13 @@ function submit_sequence() {
     var stats = [];
     stats.push(`Sequence length: ${sequence.length}`);
     stats.push(`GC content: ${countGCcontent(sequence)}`);
-    stats.push(`Number of guide RNAs created: ${outputs.length}`); // TODO: Fix for use case when only forward/reverse is generated
+    if(options.strands_shown == 'both') {
+        stats.push(`Number of guide RNAs created: ${forward_seq.length + reverse_seq.length}`);
+    } else if (options.strands_shown == 'forward') {
+        stats.push(`Number of guide RNAs created: ${forward_seq.length}`);
+    } else if (options.strands_shown == 'reverse') {
+        stats.push(`Number of guide RNAs created: ${reverse_seq.length}`);
+    }
 
     $("#stats_div").css("display", 'block');
     $("#stats").val(stats.join("\n"));
