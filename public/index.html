@@ -101,7 +101,7 @@
     </tr>
 
     <tr>
-        <td align="center">Target Intervals:</td>
+        <td align="center">Target Intervals (nt):</td>
         <td align="left"><input placeholder='1' type="TEXT" value="" name="F_primer" id="intervals" size="75"></td>
     </tr>
 
@@ -154,7 +154,7 @@
             <input type="radio" id="double_radio" name="lines" value="double">
             <label for="double_radio">Both primers on the same line</label><br>
             <input type="radio" id="files_radio" name="lines" value="files">
-            <label for="files_radio">Separate files</label><br>
+            <label for="files_radio">Separate output files</label><br>
         </div>
 
         <div class='option' style="width: 15%;">
@@ -261,7 +261,7 @@ function getOptions() {
 }
 
 function submit_sequence() {
-    event.preventDefault();
+    if(event) event.preventDefault();
 
     clear_results();
     $("#output_div").css("display", 'block');
@@ -282,7 +282,7 @@ function submit_sequence() {
 
     var outputs = [];
     var forward_seq = [];
-    var reverse_seq = []
+    var reverse_seq = [];
     var pos = 0;
 
     if ($("#spacer_length").val() === '') spacer_length = 30;
