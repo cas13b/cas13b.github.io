@@ -48,11 +48,11 @@
   globalThis.getOptions = getOptions;
 
   function getOptions() {
-    var data = $("form").serializeArray().reduce((result, val) => {
+    const data = $("form").serializeArray().reduce((result, val) => {
       result[val.name] = val.value;
       return result;
     }, {});
-    var options = {
+    const options = {
       strands_shown: data.strands_shown,
       format: data.format,
       lines: data.lines,
@@ -66,10 +66,10 @@
   function submit_sequence() {
     clear_results();
     $("#output_div").css("display", 'block');
-    var options = getOptions();
-    var errors = []; // Calculate sequences
+    const options = getOptions();
+    const errors = []; // Calculate sequences
 
-    var sequence = `${$("#fasta_sequence").val()}`.toUpperCase(),
+    let sequence = `${$("#fasta_sequence").val()}`.toUpperCase(),
         F_primer = `${$("#F_primer").val()}`.toLowerCase(),
         R_primer = `${$("#R_primer").val()}`.toLowerCase(),
         spacer_length = parseInt(`${$("#spacer_length").val()}`),
@@ -88,14 +88,14 @@
     }
 
     if (!Number.isInteger(spacer_length) && $("#spacer_length").val() !== '' || spacer_length < 1 || parseInt(`${$("#spacer_length").val()}`) === 0) {
-      var message = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
+      const message = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
       errors.push(message);
       spacer_length = 1;
     }
 
     if (seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {// console.log("Sequence is fine, no errors.");
     } else {
-      var message = "Input sequence is not DNA or RNA";
+      const message = "Input sequence is not DNA or RNA";
       errors.push(message);
     }
 
@@ -116,7 +116,7 @@
     });
     drawChart(); // Apply options
 
-    var separator = options.separator == "tabs" ? "\t" : " ";
+    const separator = options.separator == "tabs" ? "\t" : " ";
 
     if (options.format == 'fasta') {
       forward_seq = forward_seq.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, "$0\n")}`);
@@ -166,7 +166,7 @@
     } // Print stats
 
 
-    var stats = [];
+    let stats = [];
     stats.push(`Sequence length: ${sequence.length}`);
     stats.push(`GC content: ${countGCcontent(sequence)}%`);
 
@@ -182,6 +182,8 @@
     $("#stats").val(stats.join("\n"));
   }
 
+  globalThis.update_data = update_data;
+
   function update_data(link, data) {
     $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`);
   }
@@ -196,11 +198,6 @@
     });
     return Math.floor(100 * gc / total);
   }
-
-  $("#advancedOptions input").change(() => {
-    updateDisabledOptions();
-    if ($("#fasta_sequence").val() && $("#output").val()) submit_sequence();
-  });
 
   function updateDisabledOptions() {
     const options = getOptions();
@@ -269,7 +266,7 @@
 
     svg.append("rect").attr("x", 0).attr("y", 0).attr("height", height).attr("width", width).style("fill", "EBEBEB"); // Add X axis
 
-    var x = d3.scaleLinear().domain([-10, rawData.forward_seq.length]).range([0, width]);
+    var x = d3.scaleLinear().domain([-10, 10 + rawData.forward_seq.length]).range([0, width]);
     svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x).tickSize(-height * 1.3).ticks(10)).select(".domain").remove(); // Add Y axis
 
     var y = d3.scaleLinear().domain([0, 100]).range([height, 0]).nice();
@@ -281,7 +278,7 @@
 
     svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left + 20).attr("x", -margin.top - height / 2 + 20).text("GC content %"); // Color scale: give me a specie name, I return a color
 
-    var color = d3.scaleOrdinal().domain(["forward", "reverse", "average"]).range(["#F8766D", "#00BA38", "#619CFF"]);
+    const color = d3.scaleOrdinal().domain(["forward", "reverse", "average"]).range(["#F8766D", "#00BA38", "#619CFF"]);
     var tooltip, background, closeButton, title, sequence, gcContent; // Add dots
 
     svg.append('g').selectAll("dot").data(data).enter().append("circle").attr("cx", function (d) {
@@ -295,16 +292,16 @@
       title.text(d.label);
       sequence.text(d.seq);
       gcContent.text(`GC: ${d.gc}%`);
-      var textWidth = sequence.node().getBBox().width;
+      const textWidth = sequence.node().getBBox().width;
       background.attr('width', textWidth + 20);
       closeButton.attr('x', textWidth + 5);
-      var tooltipX = x(d.x) + 5;
+      let tooltipX = x(d.x) + 5;
 
       if (tooltipX + textWidth > width) {
         tooltipX = width - textWidth;
       }
 
-      var tooltipY = y(d.gc) - 75;
+      let tooltipY = y(d.gc) - 75;
 
       if (tooltipY < 0) {
         tooltipY = y(d.gc) + 5;
@@ -344,6 +341,10 @@
     });
   }
 
+  $("#advancedOptions input").change(() => {
+    updateDisabledOptions();
+    if ($("#fasta_sequence").val() && $("#output").val()) submit_sequence();
+  });
   $(document).on("keypress", function (e) {
     // ESCAPE key pressed
     if (e.keyCode == 27) {

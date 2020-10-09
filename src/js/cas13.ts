@@ -19,9 +19,16 @@ interface calculatedSequences {
     reverse_seq: string[];
 }
 
+interface options {
+    strands_shown: string;
+    format: string;
+    lines: string;
+    separator: string;
+}
+
 // Display an example
 globalThis.show_example = show_example;
-function show_example() {
+function show_example() :void{
     $("#fasta_sequence").val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $("#spacer_length").val(30);
     $("#intervals").val(1);
@@ -30,7 +37,7 @@ function show_example() {
 }
 
 globalThis.clear_results = clear_results;
-function clear_results() {
+function clear_results() :void {
     $("#errors_div").css("display", 'none');
     $("#stats_div").css("display", 'none');
     $("#output_div").css("display", 'none');
@@ -48,14 +55,14 @@ function clear_results() {
 }
 
 globalThis.getOptions = getOptions;
-function getOptions() {
-    var data:any = $("form").serializeArray()
+function getOptions() :options {
+    const data:any = $("form").serializeArray()
         .reduce( (result, val) => {
             result[val.name] = val.value;
             return result;
         }, {});
 
-    var options = {
+    const options: options = {
         strands_shown: data.strands_shown,
         format: data.format,
         lines: data.lines,
@@ -67,20 +74,20 @@ function getOptions() {
 
 
 globalThis.submit_sequence = submit_sequence;
-function submit_sequence() {
+function submit_sequence() :void {
     clear_results();
     $("#output_div").css("display", 'block');
 
-    var options = getOptions();
-    var errors = [];
+    const options: options = getOptions();
+    const errors : string[] = [];
 
 
 // Calculate sequences
-    var sequence = `${$("#fasta_sequence").val()}`.toUpperCase(),
-        F_primer = `${$("#F_primer").val()}`.toLowerCase(),
-        R_primer = `${$("#R_primer").val()}`.toLowerCase(),
-        spacer_length = parseInt(`${$("#spacer_length").val()}`),
-        intervals = parseInt(`${$("#intervals").val()}`);
+    let sequence: string = `${$("#fasta_sequence").val()}`.toUpperCase(),
+        F_primer: string = `${$("#F_primer").val()}`.toLowerCase(),
+        R_primer: string = `${$("#R_primer").val()}`.toLowerCase(),
+        spacer_length: number = parseInt(`${$("#spacer_length").val()}`),
+        intervals: number = parseInt(`${$("#intervals").val()}`);
 
     let outputs : string[] = [];
     let forward_seq : string[] = [];
@@ -97,7 +104,7 @@ function submit_sequence() {
     }
 
     if((!Number.isInteger(spacer_length) && $("#spacer_length").val() !== '') || spacer_length < 1 || parseInt(`${$("#spacer_length").val()}`) === 0) {
-        var message = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
+        const message:string = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
         errors.push(message);
         spacer_length = 1;
     }
@@ -105,7 +112,7 @@ function submit_sequence() {
     if(seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
         // console.log("Sequence is fine, no errors.");
     } else {
-        var message = "Input sequence is not DNA or RNA";
+        const message:string = "Input sequence is not DNA or RNA";
         errors.push(message);
     }
 
@@ -126,7 +133,7 @@ function submit_sequence() {
     drawChart();
 
 // Apply options
-    var separator = options.separator == "tabs" ? "\t" : " ";
+    const separator:string = options.separator == "tabs" ? "\t" : " ";
 
     if (options.format == 'fasta') {
         forward_seq = forward_seq.map( (d, i) => `>gRNA_${i+1}_F\n${d.replace(/.{80}/g, "$0\n")}`);
@@ -177,7 +184,7 @@ function submit_sequence() {
     }
 
 // Print stats
-    var stats = [];
+    let stats: string[] = [];
     stats.push(`Sequence length: ${sequence.length}`);
     stats.push(`GC content: ${countGCcontent(sequence)}%`);
     if(options.strands_shown == 'both') {
@@ -192,28 +199,23 @@ function submit_sequence() {
     $("#stats").val(stats.join("\n"));
 }
 
-function update_data(link, data) {
+globalThis.update_data = update_data;
+function update_data(link:string, data:string) :void {
     $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`);
 }
 
 globalThis.countGCcontent = countGCcontent;
-function countGCcontent(sequence) {
-    var total = sequence.length,
-        gc = 0;
+function countGCcontent(sequence:string) :number {
+    var total:number = sequence.length,
+        gc:number = 0;
     sequence.split('').forEach(char => {
         if(char === 'c' || char === 'C' || char === 'g' || char === 'G') gc++;
     });
     return Math.floor((100 * gc)/total);
 }
 
-
-$("#advancedOptions input").change(() => {
-    updateDisabledOptions();
-    if($("#fasta_sequence").val() && $("#output").val()) submit_sequence();
-});
-
-function updateDisabledOptions(){
-    const options = getOptions();
+function updateDisabledOptions() :void {
+    const options : options = getOptions();
 
     if(options.strands_shown == 'both') {
         $("input[name='lines']").prop('disabled', false);
@@ -243,7 +245,7 @@ if(window.location.hash == "#advanced") {
     $("#advancedOptions").removeClass("hidden");
 }
 
-function drawChart() {
+function drawChart() :void {
     console.log("Drawing chart");
 
     let rawData : calculatedSequences = d3.select("#output").datum() as calculatedSequences;
@@ -293,7 +295,7 @@ function drawChart() {
 
     // Add X axis
     var x = d3.scaleLinear()
-        .domain([-10, rawData.forward_seq.length])
+        .domain([-10, 10 + rawData.forward_seq.length])
         .range([ 0, width ])
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
@@ -328,12 +330,17 @@ function drawChart() {
         .text("GC content %")
 
     // Color scale: give me a specie name, I return a color
-    var color = d3.scaleOrdinal()
+    const color = d3.scaleOrdinal()
         .domain(["forward", "reverse", "average" ])
         .range([ "#F8766D", "#00BA38", "#619CFF"])
 
 
-    var tooltip, background, closeButton, title, sequence, gcContent;
+    var tooltip: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
+        background: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
+        closeButton: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
+        title: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
+        sequence: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
+        gcContent: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>;
 
     // Add dots
     svg.append('g')
@@ -341,8 +348,8 @@ function drawChart() {
         .data(data)
         .enter()
         .append("circle")
-        .attr("cx", function (d) { return x(d.x); } )
-        .attr("cy", function (d) { return y(d.gc); } )
+        .attr("cx", function (d) :number { return x(d.x); } )
+        .attr("cy", function (d) :number { return y(d.gc); } )
         .attr("r", 4)
         .style("opacity", 0.5)
         .style("fill", function (d) { return color(d.type) } as any )
@@ -352,15 +359,15 @@ function drawChart() {
             sequence.text(d.seq);
             gcContent.text(`GC: ${d.gc}%`);
 
-            var textWidth = sequence.node().getBBox().width;
+            const textWidth :number = sequence.node().getBBox().width;
             background.attr('width', textWidth + 20);
             closeButton.attr('x', textWidth + 5);
 
-            var tooltipX = x(d.x) + 5;
+            let tooltipX :number = x(d.x) + 5;
             if(tooltipX + textWidth > width) {
                 tooltipX = width - textWidth;
             }
-            var tooltipY = y(d.gc) - 75;
+            let tooltipY :number = y(d.gc) - 75;
             if (tooltipY < 0) {
                 tooltipY = y(d.gc) + 5;
             }
@@ -405,6 +412,11 @@ function drawChart() {
             y: 60
         });
 }
+
+$("#advancedOptions input").change(() => {
+    updateDisabledOptions();
+    if($("#fasta_sequence").val() && $("#output").val()) submit_sequence();
+});
 
 $(document).on("keypress", function(e) {
     // ESCAPE key pressed
