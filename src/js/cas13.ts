@@ -1,5 +1,3 @@
-console.log("hello, running test.ts");
-
 const seq = require('bionode-seq');
 
 declare module "jquery" {
@@ -58,7 +56,7 @@ globalThis.getOptions = getOptions;
 function getOptions() :options {
     const data:any = $("form").serializeArray()
         .reduce( (result, val) => {
-            result[val.name] = val.value;
+            (<any>result)[val.name] = val.value;
             return result;
         }, {});
 
@@ -352,7 +350,7 @@ function drawChart() :void {
         .attr("cy", function (d) :number { return y(d.gc); } )
         .attr("r", 4)
         .style("opacity", 0.5)
-        .style("fill", function (d) { return color(d.type) } as any )
+        .style("fill", function (d:gRNA) { return color(d.type) } as any )
         .on("mouseover", d => {
             tooltip.style("display", "block");
             title.text(d.label);
