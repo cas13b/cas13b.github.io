@@ -8,5 +8,12 @@
   },
   "repository": "https://github.com/david-ma/cas13.git",
   "author": "David Ma <david.ma@petermac.org>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "amdefine": "^1.0.1",
+    "http-proxy": "^1.18.1",
+    "mime": "^2.4.6",
+    "mustache": "^4.0.1",
+    "mysql": "^2.18.1"
+  }
 }

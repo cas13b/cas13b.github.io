@@ -68,6 +68,7 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                 }
                 catch (err) { }
                 config.standAlone = true;
+                config.folder = `${__dirname}/../public`;
                 handle.addWebsite(site, config, cred);
                 console.log("Setting workspace to: " + workspace);
                 handle.index.localhost = workspace;
