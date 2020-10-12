@@ -1,0 +1,12 @@
+{
+  "name": "cas13",
+  "version": "1.0.0",
+  "description": "A website for creating guide RNAs for cas13 experiments",
+  "main": "server/thalia.js",
+  "scripts": {
+    "start": "node server/thalia.js"
+  },
+  "repository": "https://github.com/david-ma/cas13.git",
+  "author": "David Ma <david.ma@petermac.org>",
+  "license": "MIT"
+}
