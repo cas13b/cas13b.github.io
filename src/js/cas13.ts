@@ -13,8 +13,8 @@ interface gRNA {
 }
 
 interface calculatedSequences {
-  forward_seq: string[];
-  reverse_seq: string[];
+  forwardsequence: string[];
+  reversesequence: string[];
 }
 
 interface options {
@@ -26,16 +26,16 @@ interface options {
 
 // Display an example
 globalThis.show_example = show_example
-function show_example(): void {
+function show_example (): void {
   $('#fasta_sequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
-  $('#spacer_length').val(30)
+  $('#spacerLength').val(30)
   $('#intervals').val(1)
-  $('#F_primer').val('cacc')
-  $('#R_primer').val('caac')
+  $('#forwardPrimer').val('cacc')
+  $('#reversePrimer').val('caac')
 }
 
 globalThis.clear_results = clear_results
-function clear_results(): void {
+function clear_results (): void {
   $('#errors_div').css('display', 'none')
   $('#stats_div').css('display', 'none')
   $('#output_div').css('display', 'none')
@@ -53,7 +53,7 @@ function clear_results(): void {
 }
 
 globalThis.getOptions = getOptions
-function getOptions(): options {
+function getOptions (): options {
   const data: any = $('form').serializeArray()
     .reduce((result, val) => {
       (<any>result)[val.name] = val.value
@@ -71,7 +71,7 @@ function getOptions(): options {
 }
 
 globalThis.submit_sequence = submit_sequence
-function submit_sequence(): void {
+function submit_sequence (): void {
   clear_results()
   $('#output_div').css('display', 'block')
 
@@ -80,17 +80,17 @@ function submit_sequence(): void {
 
   // Calculate sequences
   const sequence: string = `${$('#fasta_sequence').val()}`.toUpperCase()
-  const F_primer: string = `${$('#F_primer').val()}`.toLowerCase()
-  const R_primer: string = `${$('#R_primer').val()}`.toLowerCase()
-  let spacer_length: number = parseInt(`${$('#spacer_length').val()}`)
+  const forwardPrimer: string = `${$('#forwardPrimer').val()}`.toLowerCase()
+  const reversePrimer: string = `${$('#reversePrimer').val()}`.toLowerCase()
+  let spacerLength: number = parseInt(`${$('#spacerLength').val()}`)
   let intervals: number = parseInt(`${$('#intervals').val()}`)
 
   let outputs: string[] = []
-  let forward_seq: string[] = []
-  let reverse_seq: string[] = []
+  let forwardsequence: string[] = []
+  let reversesequence: string[] = []
   let pos: number = 0
 
-  if ($('#spacer_length').val() === '') spacer_length = 30
+  if ($('#spacerLength').val() === '') spacerLength = 30
   if ($('#intervals').val() === '') intervals = 1
 
   if ((!Number.isInteger(intervals) && $('#intervals').val() !== '') || intervals < 1 || parseInt(`${$('#intervals').val()}`) === 0) {
@@ -99,10 +99,10 @@ function submit_sequence(): void {
     intervals = 1
   }
 
-  if ((!Number.isInteger(spacer_length) && $('#spacer_length').val() !== '') || spacer_length < 1 || parseInt(`${$('#spacer_length').val()}`) === 0) {
-    const message: string = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1."
+  if ((!Number.isInteger(spacerLength) && $('#spacerLength').val() !== '') || spacerLength < 1 || parseInt(`${$('#spacerLength').val()}`) === 0) {
+    const message: string = "Spacer Length must be an integer 1 or greater, setting 'spacerLength' to 1."
     errors.push(message)
-    spacer_length = 1
+    spacerLength = 1
   }
 
   if (seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
@@ -113,18 +113,18 @@ function submit_sequence(): void {
   }
 
   while (pos < sequence.length) {
-    if (pos + spacer_length < sequence.length) {
-      const match = sequence.slice(pos, pos + spacer_length)
-      forward_seq.push(`${F_primer}${seq.reverse(seq.complement(match))}`)
-      reverse_seq.push(`${R_primer}${match}`)
+    if (pos + spacerLength < sequence.length) {
+      const match = sequence.slice(pos, pos + spacerLength)
+      forwardsequence.push(`${forwardPrimer}${seq.reverse(seq.complement(match))}`)
+      reversesequence.push(`${reversePrimer}${match}`)
     }
     pos += intervals
   }
 
   // Save sequences to #output for charting purposes
   d3.select('#output').datum({
-    forward_seq: forward_seq,
-    reverse_seq: reverse_seq
+    forwardsequence: forwardsequence,
+    reversesequence: reversesequence
   } as calculatedSequences)
   drawChart()
 
@@ -132,43 +132,43 @@ function submit_sequence(): void {
   const separator: string = options.separator == 'tabs' ? '\t' : ' '
 
   if (options.format == 'fasta') {
-    forward_seq = forward_seq.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
-    reverse_seq = reverse_seq.map((d, i) => `>gRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
+    forwardsequence = forwardsequence.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
+    reversesequence = reversesequence.map((d, i) => `>gRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
   } else {
-    forward_seq = forward_seq.map((d, i) => `gRNA_${i + 1}_F${separator}${d}`)
-    reverse_seq = reverse_seq.map((d, i) => `gRNA_${i + 1}_R${separator}${d}`)
+    forwardsequence = forwardsequence.map((d, i) => `gRNA_${i + 1}_F${separator}${d}`)
+    reversesequence = reversesequence.map((d, i) => `gRNA_${i + 1}_R${separator}${d}`)
   }
 
   if (options.lines == 'collate') {
-    for (var i = 0; i < forward_seq.length; i++) {
-      outputs.push(forward_seq[i])
-      outputs.push(reverse_seq[i])
+    for (var i = 0; i < forwardsequence.length; i++) {
+      outputs.push(forwardsequence[i])
+      outputs.push(reversesequence[i])
     }
   } else if (options.lines == 'separate') {
-    outputs = forward_seq.concat(reverse_seq)
+    outputs = forwardsequence.concat(reversesequence)
   } else if (options.lines == 'double') {
-    for (var i = 0; i < forward_seq.length; i++) {
-      outputs.push(forward_seq[i] + separator + reverse_seq[i])
+    for (var i = 0; i < forwardsequence.length; i++) {
+      outputs.push(forwardsequence[i] + separator + reversesequence[i])
     }
   }
 
   // Print output
   if (options.strands_shown == 'forward') {
-    $('#output').val(forward_seq.join('\n'))
+    $('#output').val(forwardsequence.join('\n'))
   } else if (options.strands_shown == 'reverse') {
-    $('#output').val(reverse_seq.join('\n'))
+    $('#output').val(reversesequence.join('\n'))
   } else {
     if (options.lines != 'files') {
       $('#output').val(outputs.join('\n'))
     } else {
-      $('#output').val(forward_seq.join('\n'))
+      $('#output').val(forwardsequence.join('\n'))
       $('#outputs').addClass('double')
       $('#extra_output_div').css('display', 'block')
-      $('#extra_output').val(reverse_seq.join('\n'))
+      $('#extra_output').val(reversesequence.join('\n'))
     }
   }
 
-  if (spacer_length > sequence.length) {
+  if (spacerLength > sequence.length) {
     errors.push('Warning, spacer length is longer than sequence length.')
   }
 
@@ -183,11 +183,11 @@ function submit_sequence(): void {
   stats.push(`Sequence length: ${sequence.length}`)
   stats.push(`GC content: ${countGCcontent(sequence)}%`)
   if (options.strands_shown == 'both') {
-    stats.push(`Number of guide RNAs created: ${forward_seq.length + reverse_seq.length}`)
+    stats.push(`Number of guide RNAs created: ${forwardsequence.length + reversesequence.length}`)
   } else if (options.strands_shown == 'forward') {
-    stats.push(`Number of guide RNAs created: ${forward_seq.length}`)
+    stats.push(`Number of guide RNAs created: ${forwardsequence.length}`)
   } else if (options.strands_shown == 'reverse') {
-    stats.push(`Number of guide RNAs created: ${reverse_seq.length}`)
+    stats.push(`Number of guide RNAs created: ${reversesequence.length}`)
   }
 
   $('#stats_div').css('display', 'block')
@@ -195,12 +195,12 @@ function submit_sequence(): void {
 }
 
 globalThis.update_data = update_data
-function update_data(link: string, data: string): void {
+function update_data (link: string, data: string): void {
   $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`)
 }
 
 globalThis.countGCcontent = countGCcontent
-function countGCcontent(sequence: string): number {
+function countGCcontent (sequence: string): number {
   const total: number = sequence.length
   let gc: number = 0
   sequence.split('').forEach(char => {
@@ -209,7 +209,7 @@ function countGCcontent(sequence: string): number {
   return Math.floor((100 * gc) / total)
 }
 
-function updateDisabledOptions(): void {
+function updateDisabledOptions (): void {
   const options: options = getOptions()
 
   if (options.strands_shown == 'both') {
@@ -239,12 +239,12 @@ if (window.location.hash == '#advanced') {
   $('#advancedOptions').removeClass('hidden')
 }
 
-function drawChart(): void {
+function drawChart (): void {
   console.log('Drawing chart')
 
   const rawData: calculatedSequences = d3.select('#output').datum() as calculatedSequences
   let data: gRNA[] = []
-  data = data.concat(rawData.forward_seq.map((d, i) => {
+  data = data.concat(rawData.forwardsequence.map((d, i) => {
     return {
       x: i,
       label: `gRNA_${i + 1}_F`,
@@ -254,7 +254,7 @@ function drawChart(): void {
     }
   }))
 
-  data = data.concat(rawData.reverse_seq.map((d, i) => {
+  data = data.concat(rawData.reversesequence.map((d, i) => {
     return {
       x: i,
       label: `gRNA_${i + 1}_R`,
@@ -289,7 +289,7 @@ function drawChart(): void {
 
   // Add X axis
   const x = d3.scaleLinear()
-    .domain([-10, 10 + rawData.forward_seq.length])
+    .domain([-10, 10 + rawData.forwardsequence.length])
     .range([0, width])
   svg.append('g')
     .attr('transform', 'translate(0,' + height + ')')
