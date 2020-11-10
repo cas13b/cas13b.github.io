@@ -33,7 +33,7 @@
 
     <tr>
         <td colspan="2">
-            <textarea name="fasta_sequence" id="fasta_sequence" rows="8" cols="100"></textarea>
+            <textarea name="fastaSequence" id="fastaSequence" rows="8" cols="100"></textarea>
         </td>
     </tr>
 
@@ -81,29 +81,29 @@
         </div>
 
         <div class='option'>
-            <input type="radio" id="classic_radio" name="format" value="classic" checked="true">
-            <label for="classic_radio">Classic format</label><br>
-            <input type="radio" id="fasta_radio" name="format" value="fasta">
-            <label for="fasta_radio">Fasta format</label><br>
+            <input type="radio" id="classicRadio" name="format" value="classic" checked="true">
+            <label for="classicRadio">Classic format</label><br>
+            <input type="radio" id="fastaRadio" name="format" value="fasta">
+            <label for="fastaRadio">Fasta format</label><br>
 
         </div>
 
         <div class='option' style="width: 35%;">
-            <input type="radio" id="collate_radio" name="lines" value="collate" checked="true">
-            <label for="collate_radio">Collate forward and reverse primers </label><br>
-            <input type="radio" id="separate_radio" name="lines" value="separate">
-            <label for="separate_radio">Forward primers, then reverse primers</label><br>
-            <input type="radio" id="double_radio" name="lines" value="double">
-            <label for="double_radio">Both primers on the same line</label><br>
-            <input type="radio" id="files_radio" name="lines" value="files">
-            <label for="files_radio">Separate output files</label><br>
+            <input type="radio" id="collateRadio" name="lines" value="collate" checked="true">
+            <label for="collateRadio">Collate forward and reverse primers </label><br>
+            <input type="radio" id="separateRadio" name="lines" value="separate">
+            <label for="separateRadio">Forward primers, then reverse primers</label><br>
+            <input type="radio" id="doubleRadio" name="lines" value="double">
+            <label for="doubleRadio">Both primers on the same line</label><br>
+            <input type="radio" id="filesRadio" name="lines" value="files">
+            <label for="filesRadio">Separate output files</label><br>
         </div>
 
         <div class='option' style="width: 15%;">
-            <input type="radio" id="spaces_radio" name="separator" value="spaces" checked="true">
-            <label for="spaces_radio">Spaces</label><br>
-            <input type="radio" id="tabs_radio" name="separator" value="tabs">
-            <label for="tabs_radio">Tabs</label><br>
+            <input type="radio" id="spacesRadio" name="separator" value="spaces" checked="true">
+            <label for="spacesRadio">Spaces</label><br>
+            <input type="radio" id="tabsRadio" name="separator" value="tabs">
+            <label for="tabsRadio">Tabs</label><br>
         </div>
     </td>
 </tr>
@@ -117,28 +117,28 @@
 
 
 <div id="outputs">
-    <div id='errors_div' style="display: none;">
+    <div id='errorsDiv' style="display: none;">
         <h2 style="color: red;">Errors:</h2>
         <textarea id='errors' rows="8" cols="100"></textarea>
     </div>
 
-    <div id='output_div' style="display: none;">
+    <div id='outputDiv' style="display: none;">
         <h2>Output:</h2> 
-        <p><a id="download_csv" onclick="updateData('#download_csv', '#output')" target="_blank" href="#results.txt" download="results.txt">Download as .txt file</a></p>
+        <p><a id="downloadCsv" onclick="updateData('#downloadCsv', '#output')" target="_blank" href="#results.txt" download="results.txt">Download as .txt file</a></p>
         <textarea id='output' rows="8" cols="100"></textarea>
     </div>
 
-    <div id='extra_output_div' style="display: none;">
+    <div id='extraOutputDiv' style="display: none;">
         <h2>Reverse Output:</h2> 
-        <p><a id="download_extra_csv" onclick="updateData('#download_extra_csv', '#extra_output')" target="_blank" href="#reverse.txt" download="reverse.txt">Download as .txt file</a></p>
-        <textarea id='extra_output' rows="8" cols="100"></textarea>
+        <p><a id="downloadExtraCsv" onclick="updateData('#downloadExtraCsv', '#extraOutput')" target="_blank" href="#reverse.txt" download="reverse.txt">Download as .txt file</a></p>
+        <textarea id='extraOutput' rows="8" cols="100"></textarea>
     </div>
 
-    <div id='stats_div' style="display: none;">
+    <div id='statsDiv' style="display: none;">
         <h2>Stats:</h2>
         <textarea id='stats' rows="8" cols="100"></textarea>
 
-        <div id="chart_div">
+        <div id="chartDiv">
             <h2>GC content of generated guide RNA:</h2>
             <svg id="chart" viewBox="0 0 900 600"></svg>
         </div>

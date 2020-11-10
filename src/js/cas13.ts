@@ -27,7 +27,7 @@ interface options {
 // Display an example
 globalThis.showExample = showExample
 function showExample (): void {
-  $('#fasta_sequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
+  $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
   $('#spacerLength').val(30)
   $('#intervals').val(1)
   $('#forwardPrimer').val('cacc')
@@ -36,15 +36,15 @@ function showExample (): void {
 
 globalThis.clearResults = clearResults
 function clearResults (): void {
-  $('#errors_div').css('display', 'none')
-  $('#stats_div').css('display', 'none')
-  $('#output_div').css('display', 'none')
-  $('#extra_output_div').css('display', 'none')
+  $('#errorsDiv').css('display', 'none')
+  $('#statsDiv').css('display', 'none')
+  $('#outputDiv').css('display', 'none')
+  $('#extraOutputDiv').css('display', 'none')
 
   $('#outputs').removeClass('double')
   $('textarea#errors').val('')
   $('textarea#output').val('')
-  $('textarea#extra_output').val('')
+  $('textarea#extraOutput').val('')
   $('textarea#stats').val('')
 
   setTimeout(function () {
@@ -73,13 +73,13 @@ function getOptions (): options {
 globalThis.submitSequence = submitSequence
 function submitSequence (): void {
   clearResults()
-  $('#output_div').css('display', 'block')
+  $('#outputDiv').css('display', 'block')
 
   const options: options = getOptions()
   const errors: string[] = []
 
   // Calculate sequences
-  const sequence: string = `${$('#fasta_sequence').val()}`.toUpperCase()
+  const sequence: string = `${$('#fastaSequence').val()}`.toUpperCase()
   const forwardPrimer: string = `${$('#forwardPrimer').val()}`.toLowerCase()
   const reversePrimer: string = `${$('#reversePrimer').val()}`.toLowerCase()
   let spacerLength: number = parseInt(`${$('#spacerLength').val()}`)
@@ -163,8 +163,8 @@ function submitSequence (): void {
     } else {
       $('#output').val(forwardsequence.join('\n'))
       $('#outputs').addClass('double')
-      $('#extra_output_div').css('display', 'block')
-      $('#extra_output').val(reversesequence.join('\n'))
+      $('#extraOutputDiv').css('display', 'block')
+      $('#extraOutput').val(reversesequence.join('\n'))
     }
   }
 
@@ -174,7 +174,7 @@ function submitSequence (): void {
 
   // Print any errors
   if (errors.length > 0) {
-    $('#errors_div').css('display', 'block')
+    $('#errorsDiv').css('display', 'block')
     $('#errors').val(errors.join('\n'))
   }
 
@@ -190,7 +190,7 @@ function submitSequence (): void {
     stats.push(`Number of guide RNAs created: ${reversesequence.length}`)
   }
 
-  $('#stats_div').css('display', 'block')
+  $('#statsDiv').css('display', 'block')
   $('#stats').val(stats.join('\n'))
 }
 
@@ -216,13 +216,13 @@ function updateDisabledOptions (): void {
     $("input[name='lines']").prop('disabled', false)
 
     if (options.format === 'fasta') {
-      $('#double_radio').prop('disabled', true)
+      $('#doubleRadio').prop('disabled', true)
 
-      if ($('#double_radio').prop('checked')) {
-        $('#collate_radio').prop('checked', true)
+      if ($('#doubleRadio').prop('checked')) {
+        $('#collateRadio').prop('checked', true)
       }
     } else {
-      $('#double_radio').prop('disabled', false)
+      $('#doubleRadio').prop('disabled', false)
     }
   } else {
     $("input[name='lines']").prop('disabled', true)
@@ -407,7 +407,7 @@ function drawChart (): void {
 
 $('#advancedOptions input').change(() => {
   updateDisabledOptions()
-  if ($('#fasta_sequence').val() && $('#output').val()) submitSequence()
+  if ($('#fastaSequence').val() && $('#output').val()) submitSequence()
 })
 
 $(document).on('keypress', function (e) {

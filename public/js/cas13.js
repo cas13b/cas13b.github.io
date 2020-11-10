@@ -2,7 +2,7 @@ const seq = require('bionode-seq');
 // Display an example
 globalThis.showExample = showExample;
 function showExample() {
-    $('#fasta_sequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
+    $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $('#spacerLength').val(30);
     $('#intervals').val(1);
     $('#forwardPrimer').val('cacc');
@@ -10,14 +10,14 @@ function showExample() {
 }
 globalThis.clearResults = clearResults;
 function clearResults() {
-    $('#errors_div').css('display', 'none');
-    $('#stats_div').css('display', 'none');
-    $('#output_div').css('display', 'none');
-    $('#extra_output_div').css('display', 'none');
+    $('#errorsDiv').css('display', 'none');
+    $('#statsDiv').css('display', 'none');
+    $('#outputDiv').css('display', 'none');
+    $('#extraOutputDiv').css('display', 'none');
     $('#outputs').removeClass('double');
     $('textarea#errors').val('');
     $('textarea#output').val('');
-    $('textarea#extra_output').val('');
+    $('textarea#extraOutput').val('');
     $('textarea#stats').val('');
     setTimeout(function () {
         updateDisabledOptions();
@@ -41,11 +41,11 @@ function getOptions() {
 globalThis.submitSequence = submitSequence;
 function submitSequence() {
     clearResults();
-    $('#output_div').css('display', 'block');
+    $('#outputDiv').css('display', 'block');
     const options = getOptions();
     const errors = [];
     // Calculate sequences
-    const sequence = `${$('#fasta_sequence').val()}`.toUpperCase();
+    const sequence = `${$('#fastaSequence').val()}`.toUpperCase();
     const forwardPrimer = `${$('#forwardPrimer').val()}`.toLowerCase();
     const reversePrimer = `${$('#reversePrimer').val()}`.toLowerCase();
     let spacerLength = parseInt(`${$('#spacerLength').val()}`);
@@ -127,8 +127,8 @@ function submitSequence() {
         else {
             $('#output').val(forwardsequence.join('\n'));
             $('#outputs').addClass('double');
-            $('#extra_output_div').css('display', 'block');
-            $('#extra_output').val(reversesequence.join('\n'));
+            $('#extraOutputDiv').css('display', 'block');
+            $('#extraOutput').val(reversesequence.join('\n'));
         }
     }
     if (spacerLength > sequence.length) {
@@ -136,7 +136,7 @@ function submitSequence() {
     }
     // Print any errors
     if (errors.length > 0) {
-        $('#errors_div').css('display', 'block');
+        $('#errorsDiv').css('display', 'block');
         $('#errors').val(errors.join('\n'));
     }
     // Print stats
@@ -152,7 +152,7 @@ function submitSequence() {
     else if (options.strandsShown === 'reverse') {
         stats.push(`Number of guide RNAs created: ${reversesequence.length}`);
     }
-    $('#stats_div').css('display', 'block');
+    $('#statsDiv').css('display', 'block');
     $('#stats').val(stats.join('\n'));
 }
 globalThis.updateData = updateData;
@@ -174,13 +174,13 @@ function updateDisabledOptions() {
     if (options.strandsShown === 'both') {
         $("input[name='lines']").prop('disabled', false);
         if (options.format === 'fasta') {
-            $('#double_radio').prop('disabled', true);
-            if ($('#double_radio').prop('checked')) {
-                $('#collate_radio').prop('checked', true);
+            $('#doubleRadio').prop('disabled', true);
+            if ($('#doubleRadio').prop('checked')) {
+                $('#collateRadio').prop('checked', true);
             }
         }
         else {
-            $('#double_radio').prop('disabled', false);
+            $('#doubleRadio').prop('disabled', false);
         }
     }
     else {
@@ -345,7 +345,7 @@ function drawChart() {
 }
 $('#advancedOptions input').change(() => {
     updateDisabledOptions();
-    if ($('#fasta_sequence').val() && $('#output').val())
+    if ($('#fastaSequence').val() && $('#output').val())
         submitSequence();
 });
 $(document).on('keypress', function (e) {
