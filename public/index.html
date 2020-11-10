@@ -72,11 +72,11 @@
     <td colspan="2">
         <!-- Make forward or reverse optional -->
         <div class='option'>
-            <input type="radio" id="showBoth" name="strands_shown" value="both" checked="true">
+            <input type="radio" id="showBoth" name="strandsShown" value="both" checked="true">
             <label for="showBoth">Show both</label><br>
-            <input type="radio" id="showForward" name="strands_shown" value="forward">
+            <input type="radio" id="showForward" name="strandsShown" value="forward">
             <label for="showForward">Forward Strand</label><br>
-            <input type="radio" id="showReverse" name="strands_shown" value="reverse">
+            <input type="radio" id="showReverse" name="strandsShown" value="reverse">
             <label for="showReverse">Reverse Strand</label><br>
         </div>
 
@@ -109,9 +109,9 @@
 </tr>
 
     </tbody></table>
-    <input type="BUTTON" value="Show Example" onclick="show_example()">
-    <input type="BUTTON" value="Submit" onclick="submit_sequence()">
-    <input type="RESET" value="Clear" onclick="clear_results()">
+    <input type="BUTTON" value="Show Example" onclick="showExample()">
+    <input type="BUTTON" value="Submit" onclick="submitSequence()">
+    <input type="RESET" value="Clear" onclick="clearResults()">
 
 </form>
 
@@ -124,13 +124,13 @@
 
     <div id='output_div' style="display: none;">
         <h2>Output:</h2> 
-        <p><a id="download_csv" onclick="update_data('#download_csv', '#output')" target="_blank" href="#results.txt" download="results.txt">Download as .txt file</a></p>
+        <p><a id="download_csv" onclick="updateData('#download_csv', '#output')" target="_blank" href="#results.txt" download="results.txt">Download as .txt file</a></p>
         <textarea id='output' rows="8" cols="100"></textarea>
     </div>
 
     <div id='extra_output_div' style="display: none;">
         <h2>Reverse Output:</h2> 
-        <p><a id="download_extra_csv" onclick="update_data('#download_extra_csv', '#extra_output')" target="_blank" href="#reverse.txt" download="reverse.txt">Download as .txt file</a></p>
+        <p><a id="download_extra_csv" onclick="updateData('#download_extra_csv', '#extra_output')" target="_blank" href="#reverse.txt" download="reverse.txt">Download as .txt file</a></p>
         <textarea id='extra_output' rows="8" cols="100"></textarea>
     </div>
 

@@ -1,15 +1,15 @@
 const seq = require('bionode-seq');
 // Display an example
-globalThis.show_example = show_example;
-function show_example() {
+globalThis.showExample = showExample;
+function showExample() {
     $('#fasta_sequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $('#spacerLength').val(30);
     $('#intervals').val(1);
     $('#forwardPrimer').val('cacc');
     $('#reversePrimer').val('caac');
 }
-globalThis.clear_results = clear_results;
-function clear_results() {
+globalThis.clearResults = clearResults;
+function clearResults() {
     $('#errors_div').css('display', 'none');
     $('#stats_div').css('display', 'none');
     $('#output_div').css('display', 'none');
@@ -31,16 +31,16 @@ function getOptions() {
         return result;
     }, {});
     const options = {
-        strands_shown: data.strands_shown,
+        strandsShown: data.strandsShown,
         format: data.format,
         lines: data.lines,
         separator: data.separator
     };
     return options;
 }
-globalThis.submit_sequence = submit_sequence;
-function submit_sequence() {
-    clear_results();
+globalThis.submitSequence = submitSequence;
+function submitSequence() {
+    clearResults();
     $('#output_div').css('display', 'block');
     const options = getOptions();
     const errors = [];
@@ -68,7 +68,7 @@ function submit_sequence() {
         errors.push(message);
         spacerLength = 1;
     }
-    if (seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
+    if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
         // console.log("Sequence is fine, no errors.");
     }
     else {
@@ -90,8 +90,8 @@ function submit_sequence() {
     });
     drawChart();
     // Apply options
-    const separator = options.separator == 'tabs' ? '\t' : ' ';
-    if (options.format == 'fasta') {
+    const separator = options.separator === 'tabs' ? '\t' : ' ';
+    if (options.format === 'fasta') {
         forwardsequence = forwardsequence.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`);
         reversesequence = reversesequence.map((d, i) => `>gRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`);
     }
@@ -99,29 +99,29 @@ function submit_sequence() {
         forwardsequence = forwardsequence.map((d, i) => `gRNA_${i + 1}_F${separator}${d}`);
         reversesequence = reversesequence.map((d, i) => `gRNA_${i + 1}_R${separator}${d}`);
     }
-    if (options.lines == 'collate') {
-        for (var i = 0; i < forwardsequence.length; i++) {
+    if (options.lines === 'collate') {
+        for (let i = 0; i < forwardsequence.length; i++) {
             outputs.push(forwardsequence[i]);
             outputs.push(reversesequence[i]);
         }
     }
-    else if (options.lines == 'separate') {
+    else if (options.lines === 'separate') {
         outputs = forwardsequence.concat(reversesequence);
     }
-    else if (options.lines == 'double') {
-        for (var i = 0; i < forwardsequence.length; i++) {
+    else if (options.lines === 'double') {
+        for (let i = 0; i < forwardsequence.length; i++) {
             outputs.push(forwardsequence[i] + separator + reversesequence[i]);
         }
     }
     // Print output
-    if (options.strands_shown == 'forward') {
+    if (options.strandsShown === 'forward') {
         $('#output').val(forwardsequence.join('\n'));
     }
-    else if (options.strands_shown == 'reverse') {
+    else if (options.strandsShown === 'reverse') {
         $('#output').val(reversesequence.join('\n'));
     }
     else {
-        if (options.lines != 'files') {
+        if (options.lines !== 'files') {
             $('#output').val(outputs.join('\n'));
         }
         else {
@@ -143,20 +143,20 @@ function submit_sequence() {
     const stats = [];
     stats.push(`Sequence length: ${sequence.length}`);
     stats.push(`GC content: ${countGCcontent(sequence)}%`);
-    if (options.strands_shown == 'both') {
+    if (options.strandsShown === 'both') {
         stats.push(`Number of guide RNAs created: ${forwardsequence.length + reversesequence.length}`);
     }
-    else if (options.strands_shown == 'forward') {
+    else if (options.strandsShown === 'forward') {
         stats.push(`Number of guide RNAs created: ${forwardsequence.length}`);
     }
-    else if (options.strands_shown == 'reverse') {
+    else if (options.strandsShown === 'reverse') {
         stats.push(`Number of guide RNAs created: ${reversesequence.length}`);
     }
     $('#stats_div').css('display', 'block');
     $('#stats').val(stats.join('\n'));
 }
-globalThis.update_data = update_data;
-function update_data(link, data) {
+globalThis.updateData = updateData;
+function updateData(link, data) {
     $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`);
 }
 globalThis.countGCcontent = countGCcontent;
@@ -171,9 +171,9 @@ function countGCcontent(sequence) {
 }
 function updateDisabledOptions() {
     const options = getOptions();
-    if (options.strands_shown == 'both') {
+    if (options.strandsShown === 'both') {
         $("input[name='lines']").prop('disabled', false);
-        if (options.format == 'fasta') {
+        if (options.format === 'fasta') {
             $('#double_radio').prop('disabled', true);
             if ($('#double_radio').prop('checked')) {
                 $('#collate_radio').prop('checked', true);
@@ -186,14 +186,14 @@ function updateDisabledOptions() {
     else {
         $("input[name='lines']").prop('disabled', true);
     }
-    if (options.format == 'classic') {
+    if (options.format === 'classic') {
         $("input[name='separator']").prop('disabled', false);
     }
     else {
         $("input[name='separator']").prop('disabled', true);
     }
 }
-if (window.location.hash == '#advanced') {
+if (window.location.hash === '#advanced') {
     $('#advancedOptions').removeClass('hidden');
 }
 function drawChart() {
@@ -272,7 +272,12 @@ function drawChart() {
     const color = d3.scaleOrdinal()
         .domain(['forward', 'reverse', 'average'])
         .range(['#F8766D', '#00BA38', '#619CFF']);
-    let tooltip, background, closeButton, title, sequence, gcContent;
+    let tooltip = null;
+    let background = null;
+    let closeButton = null;
+    let title = null;
+    let sequence = null;
+    let gcContent = null;
     // Add dots
     svg.append('g')
         .selectAll('dot')
@@ -341,11 +346,11 @@ function drawChart() {
 $('#advancedOptions input').change(() => {
     updateDisabledOptions();
     if ($('#fasta_sequence').val() && $('#output').val())
-        submit_sequence();
+        submitSequence();
 });
 $(document).on('keypress', function (e) {
     // ESCAPE key pressed
-    if (e.keyCode == 27) {
+    if (e.keyCode === 27) {
         d3.select('#chart-tooltip').style('display', 'none');
     }
 });

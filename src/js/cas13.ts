@@ -18,15 +18,15 @@ interface calculatedSequences {
 }
 
 interface options {
-  strands_shown: string;
+  strandsShown: string;
   format: string;
   lines: string;
   separator: string;
 }
 
 // Display an example
-globalThis.show_example = show_example
-function show_example (): void {
+globalThis.showExample = showExample
+function showExample (): void {
   $('#fasta_sequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
   $('#spacerLength').val(30)
   $('#intervals').val(1)
@@ -34,8 +34,8 @@ function show_example (): void {
   $('#reversePrimer').val('caac')
 }
 
-globalThis.clear_results = clear_results
-function clear_results (): void {
+globalThis.clearResults = clearResults
+function clearResults (): void {
   $('#errors_div').css('display', 'none')
   $('#stats_div').css('display', 'none')
   $('#output_div').css('display', 'none')
@@ -61,7 +61,7 @@ function getOptions (): options {
     }, {})
 
   const options: options = {
-    strands_shown: data.strands_shown,
+    strandsShown: data.strandsShown,
     format: data.format,
     lines: data.lines,
     separator: data.separator
@@ -70,9 +70,9 @@ function getOptions (): options {
   return options
 }
 
-globalThis.submit_sequence = submit_sequence
-function submit_sequence (): void {
-  clear_results()
+globalThis.submitSequence = submitSequence
+function submitSequence (): void {
+  clearResults()
   $('#output_div').css('display', 'block')
 
   const options: options = getOptions()
@@ -105,7 +105,7 @@ function submit_sequence (): void {
     spacerLength = 1
   }
 
-  if (seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
+  if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
     // console.log("Sequence is fine, no errors.");
   } else {
     const message: string = 'Input sequence is not DNA or RNA'
@@ -129,9 +129,9 @@ function submit_sequence (): void {
   drawChart()
 
   // Apply options
-  const separator: string = options.separator == 'tabs' ? '\t' : ' '
+  const separator: string = options.separator === 'tabs' ? '\t' : ' '
 
-  if (options.format == 'fasta') {
+  if (options.format === 'fasta') {
     forwardsequence = forwardsequence.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
     reversesequence = reversesequence.map((d, i) => `>gRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
   } else {
@@ -139,26 +139,26 @@ function submit_sequence (): void {
     reversesequence = reversesequence.map((d, i) => `gRNA_${i + 1}_R${separator}${d}`)
   }
 
-  if (options.lines == 'collate') {
-    for (var i = 0; i < forwardsequence.length; i++) {
+  if (options.lines === 'collate') {
+    for (let i = 0; i < forwardsequence.length; i++) {
       outputs.push(forwardsequence[i])
       outputs.push(reversesequence[i])
     }
-  } else if (options.lines == 'separate') {
+  } else if (options.lines === 'separate') {
     outputs = forwardsequence.concat(reversesequence)
-  } else if (options.lines == 'double') {
-    for (var i = 0; i < forwardsequence.length; i++) {
+  } else if (options.lines === 'double') {
+    for (let i = 0; i < forwardsequence.length; i++) {
       outputs.push(forwardsequence[i] + separator + reversesequence[i])
     }
   }
 
   // Print output
-  if (options.strands_shown == 'forward') {
+  if (options.strandsShown === 'forward') {
     $('#output').val(forwardsequence.join('\n'))
-  } else if (options.strands_shown == 'reverse') {
+  } else if (options.strandsShown === 'reverse') {
     $('#output').val(reversesequence.join('\n'))
   } else {
-    if (options.lines != 'files') {
+    if (options.lines !== 'files') {
       $('#output').val(outputs.join('\n'))
     } else {
       $('#output').val(forwardsequence.join('\n'))
@@ -182,11 +182,11 @@ function submit_sequence (): void {
   const stats: string[] = []
   stats.push(`Sequence length: ${sequence.length}`)
   stats.push(`GC content: ${countGCcontent(sequence)}%`)
-  if (options.strands_shown == 'both') {
+  if (options.strandsShown === 'both') {
     stats.push(`Number of guide RNAs created: ${forwardsequence.length + reversesequence.length}`)
-  } else if (options.strands_shown == 'forward') {
+  } else if (options.strandsShown === 'forward') {
     stats.push(`Number of guide RNAs created: ${forwardsequence.length}`)
-  } else if (options.strands_shown == 'reverse') {
+  } else if (options.strandsShown === 'reverse') {
     stats.push(`Number of guide RNAs created: ${reversesequence.length}`)
   }
 
@@ -194,8 +194,8 @@ function submit_sequence (): void {
   $('#stats').val(stats.join('\n'))
 }
 
-globalThis.update_data = update_data
-function update_data (link: string, data: string): void {
+globalThis.updateData = updateData
+function updateData (link: string, data: string): void {
   $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`)
 }
 
@@ -212,10 +212,10 @@ function countGCcontent (sequence: string): number {
 function updateDisabledOptions (): void {
   const options: options = getOptions()
 
-  if (options.strands_shown == 'both') {
+  if (options.strandsShown === 'both') {
     $("input[name='lines']").prop('disabled', false)
 
-    if (options.format == 'fasta') {
+    if (options.format === 'fasta') {
       $('#double_radio').prop('disabled', true)
 
       if ($('#double_radio').prop('checked')) {
@@ -228,14 +228,14 @@ function updateDisabledOptions (): void {
     $("input[name='lines']").prop('disabled', true)
   }
 
-  if (options.format == 'classic') {
+  if (options.format === 'classic') {
     $("input[name='separator']").prop('disabled', false)
   } else {
     $("input[name='separator']").prop('disabled', true)
   }
 }
 
-if (window.location.hash == '#advanced') {
+if (window.location.hash === '#advanced') {
   $('#advancedOptions').removeClass('hidden')
 }
 
@@ -328,12 +328,12 @@ function drawChart (): void {
     .domain(['forward', 'reverse', 'average'])
     .range(['#F8766D', '#00BA38', '#619CFF'])
 
-  let tooltip: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
-    background: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
-    closeButton: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
-    title: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
-    sequence: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>,
-    gcContent: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any>
+  let tooltip: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
+  let background: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
+  let closeButton: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
+  let title: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
+  let sequence: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
+  let gcContent: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
 
   // Add dots
   svg.append('g')
@@ -407,12 +407,12 @@ function drawChart (): void {
 
 $('#advancedOptions input').change(() => {
   updateDisabledOptions()
-  if ($('#fasta_sequence').val() && $('#output').val()) submit_sequence()
+  if ($('#fasta_sequence').val() && $('#output').val()) submitSequence()
 })
 
 $(document).on('keypress', function (e) {
   // ESCAPE key pressed
-  if (e.keyCode == 27) {
+  if (e.keyCode === 27) {
     d3.select('#chart-tooltip').style('display', 'none')
   }
 })
