@@ -1,6 +1,23 @@
 {
-    "compilerOptions": {
-        "noImplicitAny": true,
-        "target": "es5"
-    }
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "dist",
+    "target": "ES2015",
+    "module": "AMD",
+    "moduleResolution": "Node",
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "incremental": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "config"
+  ]
 }
