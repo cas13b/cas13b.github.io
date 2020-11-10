@@ -1,4 +1,4 @@
-var seq = require('bionode-seq');
+const seq = require('bionode-seq');
 // Display an example
 globalThis.show_example = show_example;
 function show_example() {
@@ -25,12 +25,12 @@ function clear_results() {
 }
 globalThis.getOptions = getOptions;
 function getOptions() {
-    var data = $("form").serializeArray()
-        .reduce(function (result, val) {
+    const data = $("form").serializeArray()
+        .reduce((result, val) => {
         result[val.name] = val.value;
         return result;
     }, {});
-    var options = {
+    const options = {
         strands_shown: data.strands_shown,
         format: data.format,
         lines: data.lines,
@@ -42,40 +42,40 @@ globalThis.submit_sequence = submit_sequence;
 function submit_sequence() {
     clear_results();
     $("#output_div").css("display", 'block');
-    var options = getOptions();
-    var errors = [];
+    const options = getOptions();
+    const errors = [];
     // Calculate sequences
-    var sequence = ("" + $("#fasta_sequence").val()).toUpperCase(), F_primer = ("" + $("#F_primer").val()).toLowerCase(), R_primer = ("" + $("#R_primer").val()).toLowerCase(), spacer_length = parseInt("" + $("#spacer_length").val()), intervals = parseInt("" + $("#intervals").val());
-    var outputs = [];
-    var forward_seq = [];
-    var reverse_seq = [];
-    var pos = 0;
+    let sequence = `${$("#fasta_sequence").val()}`.toUpperCase(), F_primer = `${$("#F_primer").val()}`.toLowerCase(), R_primer = `${$("#R_primer").val()}`.toLowerCase(), spacer_length = parseInt(`${$("#spacer_length").val()}`), intervals = parseInt(`${$("#intervals").val()}`);
+    let outputs = [];
+    let forward_seq = [];
+    let reverse_seq = [];
+    let pos = 0;
     if ($("#spacer_length").val() === '')
         spacer_length = 30;
     if ($("#intervals").val() === '')
         intervals = 1;
-    if ((!Number.isInteger(intervals) && $("#intervals").val() !== '') || intervals < 1 || parseInt("" + $("#intervals").val()) === 0) {
+    if ((!Number.isInteger(intervals) && $("#intervals").val() !== '') || intervals < 1 || parseInt(`${$("#intervals").val()}`) === 0) {
         var message = "Intervals must be an integer 1 or greater, setting 'intervals' to 1.";
         errors.push(message);
         intervals = 1;
     }
-    if ((!Number.isInteger(spacer_length) && $("#spacer_length").val() !== '') || spacer_length < 1 || parseInt("" + $("#spacer_length").val()) === 0) {
-        var message_1 = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
-        errors.push(message_1);
+    if ((!Number.isInteger(spacer_length) && $("#spacer_length").val() !== '') || spacer_length < 1 || parseInt(`${$("#spacer_length").val()}`) === 0) {
+        const message = "Spacer Length must be an integer 1 or greater, setting 'spacer_length' to 1.";
+        errors.push(message);
         spacer_length = 1;
     }
     if (seq.checkType(sequence, 1) == 'dna' || seq.checkType(sequence, 1) == 'rna') {
         // console.log("Sequence is fine, no errors.");
     }
     else {
-        var message_2 = "Input sequence is not DNA or RNA";
-        errors.push(message_2);
+        const message = "Input sequence is not DNA or RNA";
+        errors.push(message);
     }
     while (pos < sequence.length) {
         if (pos + spacer_length < sequence.length) {
             var match = sequence.slice(pos, pos + spacer_length);
-            forward_seq.push("" + F_primer + seq.reverse(seq.complement(match)));
-            reverse_seq.push("" + R_primer + match);
+            forward_seq.push(`${F_primer}${seq.reverse(seq.complement(match))}`);
+            reverse_seq.push(`${R_primer}${match}`);
         }
         pos += intervals;
     }
@@ -86,14 +86,14 @@ function submit_sequence() {
     });
     drawChart();
     // Apply options
-    var separator = options.separator == "tabs" ? "\t" : " ";
+    const separator = options.separator == "tabs" ? "\t" : " ";
     if (options.format == 'fasta') {
-        forward_seq = forward_seq.map(function (d, i) { return ">gRNA_" + (i + 1) + "_F\n" + d.replace(/.{80}/g, "$0\n"); });
-        reverse_seq = reverse_seq.map(function (d, i) { return ">gRNA_" + (i + 1) + "_R\n" + d.replace(/.{80}/g, "$0\n"); });
+        forward_seq = forward_seq.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, "$0\n")}`);
+        reverse_seq = reverse_seq.map((d, i) => `>gRNA_${i + 1}_R\n${d.replace(/.{80}/g, "$0\n")}`);
     }
     else {
-        forward_seq = forward_seq.map(function (d, i) { return "gRNA_" + (i + 1) + "_F" + separator + d; });
-        reverse_seq = reverse_seq.map(function (d, i) { return "gRNA_" + (i + 1) + "_R" + separator + d; });
+        forward_seq = forward_seq.map((d, i) => `gRNA_${i + 1}_F${separator}${d}`);
+        reverse_seq = reverse_seq.map((d, i) => `gRNA_${i + 1}_R${separator}${d}`);
     }
     if (options.lines == 'collate') {
         for (var i = 0; i < forward_seq.length; i++) {
@@ -136,36 +136,36 @@ function submit_sequence() {
         $("#errors").val(errors.join("\n"));
     }
     // Print stats
-    var stats = [];
-    stats.push("Sequence length: " + sequence.length);
-    stats.push("GC content: " + countGCcontent(sequence) + "%");
+    let stats = [];
+    stats.push(`Sequence length: ${sequence.length}`);
+    stats.push(`GC content: ${countGCcontent(sequence)}%`);
     if (options.strands_shown == 'both') {
-        stats.push("Number of guide RNAs created: " + (forward_seq.length + reverse_seq.length));
+        stats.push(`Number of guide RNAs created: ${forward_seq.length + reverse_seq.length}`);
     }
     else if (options.strands_shown == 'forward') {
-        stats.push("Number of guide RNAs created: " + forward_seq.length);
+        stats.push(`Number of guide RNAs created: ${forward_seq.length}`);
     }
     else if (options.strands_shown == 'reverse') {
-        stats.push("Number of guide RNAs created: " + reverse_seq.length);
+        stats.push(`Number of guide RNAs created: ${reverse_seq.length}`);
     }
     $("#stats_div").css("display", 'block');
     $("#stats").val(stats.join("\n"));
 }
 globalThis.update_data = update_data;
 function update_data(link, data) {
-    $(link).prop('href', "data:text/plain;charset=utf-8," + encodeURIComponent("" + $(data).val()));
+    $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`);
 }
 globalThis.countGCcontent = countGCcontent;
 function countGCcontent(sequence) {
     var total = sequence.length, gc = 0;
-    sequence.split('').forEach(function (char) {
+    sequence.split('').forEach(char => {
         if (char === 'c' || char === 'C' || char === 'g' || char === 'G')
             gc++;
     });
     return Math.floor((100 * gc) / total);
 }
 function updateDisabledOptions() {
-    var options = getOptions();
+    const options = getOptions();
     if (options.strands_shown == 'both') {
         $("input[name='lines']").prop('disabled', false);
         if (options.format == 'fasta') {
@@ -193,28 +193,28 @@ if (window.location.hash == "#advanced") {
 }
 function drawChart() {
     console.log("Drawing chart");
-    var rawData = d3.select("#output").datum();
-    var data = [];
-    data = data.concat(rawData.forward_seq.map(function (d, i) {
+    let rawData = d3.select("#output").datum();
+    let data = [];
+    data = data.concat(rawData.forward_seq.map((d, i) => {
         return {
             x: i,
-            label: "gRNA_" + (i + 1) + "_F",
+            label: `gRNA_${i + 1}_F`,
             seq: d,
             gc: countGCcontent(d),
             type: 'forward'
         };
     }));
-    data = data.concat(rawData.reverse_seq.map(function (d, i) {
+    data = data.concat(rawData.reverse_seq.map((d, i) => {
         return {
             x: i,
-            label: "gRNA_" + (i + 1) + "_R",
+            label: `gRNA_${i + 1}_R`,
             seq: d,
             gc: countGCcontent(d),
             type: 'reverse'
         };
     }));
     // set the dimensions and margins of the graph
-    var margin = { top: 10, right: 30, bottom: 40, left: 50 }, width = 900 - margin.left - margin.right, height = 600 - margin.top - margin.bottom;
+    const margin = { top: 10, right: 30, bottom: 40, left: 50 }, width = 900 - margin.left - margin.right, height = 600 - margin.top - margin.bottom;
     d3.select("#chart g").remove();
     // append the svg object to the body of the page
     var svg = d3.select("#chart")
@@ -262,7 +262,7 @@ function drawChart() {
         .attr("x", -margin.top - height / 2 + 20)
         .text("GC content %");
     // Color scale: give me a specie name, I return a color
-    var color = d3.scaleOrdinal()
+    const color = d3.scaleOrdinal()
         .domain(["forward", "reverse", "average"])
         .range(["#F8766D", "#00BA38", "#619CFF"]);
     var tooltip, background, closeButton, title, sequence, gcContent;
@@ -277,23 +277,23 @@ function drawChart() {
         .attr("r", 4)
         .style("opacity", 0.5)
         .style("fill", function (d) { return color(d.type); })
-        .on("mouseover", function (d) {
+        .on("mouseover", d => {
         tooltip.style("display", "block");
         title.text(d.label);
         sequence.text(d.seq);
-        gcContent.text("GC: " + d.gc + "%");
-        var textWidth = sequence.node().getBBox().width;
+        gcContent.text(`GC: ${d.gc}%`);
+        const textWidth = sequence.node().getBBox().width;
         background.attr('width', textWidth + 20);
         closeButton.attr('x', textWidth + 5);
-        var tooltipX = x(d.x) + 5;
+        let tooltipX = x(d.x) + 5;
         if (tooltipX + textWidth > width) {
             tooltipX = width - textWidth;
         }
-        var tooltipY = y(d.gc) - 75;
+        let tooltipY = y(d.gc) - 75;
         if (tooltipY < 0) {
             tooltipY = y(d.gc) + 5;
         }
-        tooltip.attr("transform", "translate(" + tooltipX + ", " + tooltipY + ")");
+        tooltip.attr("transform", `translate(${tooltipX}, ${tooltipY})`);
     });
     // Add label
     tooltip = svg.append("g")
@@ -314,7 +314,7 @@ function drawChart() {
         y: 18,
         'font-weight': 700
     }).style("cursor", "pointer")
-        .on('click', function () { tooltip.style("display", "none"); });
+        .on('click', () => { tooltip.style("display", "none"); });
     title = tooltip.append('text').text("title")
         .attrs({
         x: 10,
@@ -331,7 +331,7 @@ function drawChart() {
         y: 60
     });
 }
-$("#advancedOptions input").change(function () {
+$("#advancedOptions input").change(() => {
     updateDisabledOptions();
     if ($("#fasta_sequence").val() && $("#output").val())
         submit_sequence();
