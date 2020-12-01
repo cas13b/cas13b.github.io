@@ -285,7 +285,7 @@ function drawChart (): void {
     .attr('y', 0)
     .attr('height', height)
     .attr('width', width)
-    .style('fill', 'EBEBEB')
+    .style('fill', '#EBEBEB')
 
   // Add X axis
   const x = d3.scaleLinear()
