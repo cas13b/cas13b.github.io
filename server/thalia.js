@@ -1,15 +1,7 @@
-// moduleShim.ts
-/**
- * This shim is required at the start of the thalia.js bundle
- * so that the AMD modules work properly.
- * And index.js must come after the modules have been defined.
- * Use 'files' in tsconfig to ensure correct order.
- * DKGM 12-Oct-2020
- */
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], function (require, exports, fs, mustache, path) {
+define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass"], function (require, exports, fs, mustache, path, sass) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Website = exports.handle = void 0;
@@ -18,25 +10,40 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
         constructor(site, config) {
             if (typeof config === 'object') {
                 this.name = site;
-                this.data = ''; // Used to be false. Todo: Check if this is ok
-                this.dist = ''; // Used to be false. Todo: Check if this is ok
+                this.data = '';
+                this.dist = '';
                 this.cache = typeof config.cache === 'boolean' ? config.cache : true;
-                this.folder = typeof config.folder === 'string' ? config.folder : 'websites/' + site + '/public';
+                this.folder =
+                    typeof config.folder === 'string'
+                        ? config.folder
+                        : 'websites/' + site + '/public';
                 this.domains = typeof config.domains === 'object' ? config.domains : [];
                 this.pages = typeof config.pages === 'object' ? config.pages : {};
-                this.redirects = typeof config.redirects === 'object' ? config.redirects : {};
+                this.redirects =
+                    typeof config.redirects === 'object' ? config.redirects : {};
                 this.services = typeof config.services === 'object' ? config.services : {};
-                this.controllers = typeof config.controllers === 'object' ? config.controllers : {};
+                this.controllers =
+                    typeof config.controllers === 'object' ? config.controllers : {};
                 this.proxies = typeof config.proxies === 'object' ? config.proxies : {};
-                this.sockets = typeof config.sockets === 'object' ? config.sockets : { on: [], emit: [] };
-                this.security = typeof config.security === 'object' ? config.security : { loginNeeded: function () { return false; } };
+                this.sockets =
+                    typeof config.sockets === 'object'
+                        ? config.sockets
+                        : { on: [], emit: [] };
+                this.security =
+                    typeof config.security === 'object'
+                        ? config.security
+                        : {
+                            loginNeeded: function () {
+                                return false;
+                            },
+                        };
                 this.viewableFolders = config.viewableFolders || false;
+                this.views = false;
             }
             else {
                 console.log("Config isn't an object");
             }
         }
-        ;
     }
     exports.Website = Website;
     const handle = {
@@ -81,14 +88,17 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 console.log('Only load %s', handle.index.localhost);
                 const site = handle.index.localhost;
                 console.log('Adding site: ' + site);
-                let config;
+                let config = {};
                 try {
                     const start = Date.now();
                     if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config.js'))) {
                         config = require(path.resolve(__dirname, '..', 'websites', site, 'config')).config;
                     }
-                    else {
+                    else if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config', 'config.js'))) {
                         config = require(path.resolve(__dirname, '..', 'websites', site, 'config', 'config')).config;
+                    }
+                    else {
+                        console.log(`No config provided for ${site}, just serving the public folder`);
                     }
                     console.log(`${Date.now() - start} ms - config.js for ${site}`);
                 }
@@ -110,13 +120,16 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 fs.readdirSync('websites/').forEach(function (site) {
                     if (fs.lstatSync('websites/' + site).isDirectory()) {
                         console.log('Adding site: ' + site);
-                        let config;
+                        let config = {};
                         try {
                             if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config.js'))) {
                                 config = require(path.resolve(__dirname, '..', 'websites', site, 'config')).config;
                             }
-                            else {
+                            else if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config', 'config.js'))) {
                                 config = require(path.resolve(__dirname, '..', 'websites', site, 'config', 'config')).config;
+                            }
+                            else {
+                                console.log(`No config provided for ${site}, just serve the public folder`);
                             }
                         }
                         catch (err) {
@@ -126,13 +139,11 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                                 console.log();
                             }
                             else {
-                                // Note, we want this to be silent if config.js is missing, because we can just serve the public/dist folders.
-                                // but log an error if config.js requires something that is not available.
-                                if (err.requireStack[0].indexOf('thalia.js') > 0) {
+                                if (err.requireStack &&
+                                    err.requireStack[0].indexOf('thalia.js') > 0) {
                                     console.log(`${site} does not use config.js, just serve the public folder`);
                                 }
                                 else {
-                                    // Do we want errors to appear in standard error? Or standard log??? Both???
                                     console.error(`Error loading config for ${site}`);
                                     console.log(err);
                                     console.log();
@@ -144,28 +155,50 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 });
             }
         },
-        // TODO: Make all of this asynchronous?
-        // Add a site to the handle
         addWebsite: function (site, config) {
             config = config || {};
             handle.websites[site] = new Website(site, config);
-            const baseUrl = config.standAlone ? path.resolve(__dirname, '..') : path.resolve(__dirname, '..', 'websites', site);
-            // If dist or data exist, enable them.
+            const baseUrl = config.standAlone
+                ? path.resolve(__dirname, '..')
+                : path.resolve(__dirname, '..', 'websites', site);
             if (fs.existsSync(path.resolve(baseUrl, 'data'))) {
                 handle.websites[site].data = path.resolve(baseUrl, 'data');
             }
             if (fs.existsSync(path.resolve(baseUrl, 'dist'))) {
                 handle.websites[site].dist = path.resolve(baseUrl, 'dist');
             }
-            Object.keys(handle.websites[site].proxies).forEach(function (proxy) {
-                handle.proxies[proxy] = handle.websites[site].proxies[proxy];
-            });
-            // Add the site to the index
-            handle.index[site + '.david-ma.net'] = site;
-            handle.websites[site].domains.forEach(function (domain) {
-                handle.index[domain] = site;
-            });
-            // If sequelize is set up, add it.
+            if (Array.isArray(handle.websites[site].proxies)) {
+                ;
+                handle.websites[site].proxies.forEach(function (proxy) {
+                    proxy.domains.forEach((domain) => {
+                        handle.proxies[domain] = makeProxy(handle.proxies[domain], proxy);
+                    });
+                });
+            }
+            else {
+                Object.keys(handle.websites[site].proxies).forEach(function (domain) {
+                    const rawProxy = (handle.websites[site].proxies)[domain];
+                    handle.proxies[domain] = makeProxy(handle.proxies[domain], rawProxy);
+                });
+            }
+            function makeProxy(proxies, rawProxy) {
+                proxies = proxies || {};
+                const proxy = {
+                    host: rawProxy.host || '127.0.0.1',
+                    message: rawProxy.message || 'Error, server is down.',
+                    port: rawProxy.port || 80,
+                    filter: rawProxy.filter,
+                    password: rawProxy.password,
+                    silent: rawProxy.silent || false,
+                };
+                if (rawProxy.filter) {
+                    proxies[rawProxy.filter] = proxy;
+                }
+                else {
+                    proxies['*'] = proxy;
+                }
+                return proxies;
+            }
             if (fs.existsSync(path.resolve(baseUrl, 'db_bootstrap.js'))) {
                 try {
                     const start = Date.now();
@@ -186,29 +219,31 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                     console.log(e);
                 }
             }
-            // If website has views, load them.
             if (fs.existsSync(path.resolve(baseUrl, 'views'))) {
-                // Stupid hack for development if you don't want to cache the views :(
+                handle.websites[site].views = true;
                 handle.websites[site].readAllViews = function (cb) {
-                    readAllViews(path.resolve(baseUrl, 'views')).then(d => cb(d));
+                    readAllViews(path.resolve(baseUrl, 'views')).then((d) => cb(d));
                 };
                 handle.websites[site].readTemplate = function (template, content, cb) {
-                    readTemplate(template, path.resolve(baseUrl, 'views'), content).then(d => cb(d));
+                    readTemplate(template, path.resolve(baseUrl, 'views'), content).then((d) => cb(d));
                 };
-                readAllViews(path.resolve(baseUrl, 'views')).then(views => {
+                readAllViews(path.resolve(baseUrl, 'views')).then((views) => {
                     handle.websites[site].views = views;
-                    fsPromise.readdir(path.resolve(baseUrl, 'views'))
+                    fsPromise
+                        .readdir(path.resolve(baseUrl, 'views'))
                         .then(function (d) {
                         d.filter((d) => d.indexOf('.mustache') > 0).forEach((file) => {
                             const webpage = file.split('.mustache')[0];
-                            if ((config.mustacheIgnore ? config.mustacheIgnore.indexOf(webpage) === -1 : true) &&
+                            if ((config.mustacheIgnore
+                                ? config.mustacheIgnore.indexOf(webpage) === -1
+                                : true) &&
                                 !handle.websites[site].controllers[webpage]) {
                                 handle.websites[site].controllers[webpage] = function (controller) {
                                     if (handle.websites[site].cache) {
                                         controller.res.end(mustache.render(views[webpage], {}, views));
                                     }
                                     else {
-                                        readAllViews(path.resolve(baseUrl, 'views')).then(views => {
+                                        readAllViews(path.resolve(baseUrl, 'views')).then((views) => {
                                             handle.websites[site].views = views;
                                             controller.res.end(mustache.render(views[webpage], {}, views));
                                         });
@@ -216,84 +251,96 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                                 };
                             }
                         });
-                    }).catch((e) => console.log(e));
+                    })
+                        .catch((e) => console.log(e));
                 });
             }
-            // Unused feature? Commenting it out DKGM 2020-10-29
-            // If the site has any startup actions, do them
-            // if(config.startup){
-            //     config.startup.forEach(function(action:any){
-            //         action(handle.websites[site]);
-            //     });
-            // }
+            handle.index[site + '.david-ma.net'] = site;
+            handle.index[`${site}.com`] = site;
+            handle.index[`${site}.net`] = site;
+            handle.websites[site].domains.forEach(function (domain) {
+                handle.index[domain] = site;
+            });
         },
         getWebsite: function (domain) {
             let site = handle.index.localhost;
             if (domain) {
-                // if (handle.index.hasOwnProperty(domain)) {
                 if (Object.prototype.hasOwnProperty.call(handle.index, domain)) {
                     site = handle.index[domain];
                 }
                 domain = domain.replace('www.', '');
-                // if (handle.index.hasOwnProperty(domain)) {
                 if (Object.prototype.hasOwnProperty.call(handle.index, domain)) {
                     site = handle.index[domain];
                 }
             }
             return handle.websites[site];
         },
-        proxies: {}
+        proxies: {},
     };
     exports.handle = handle;
     handle.addWebsite('default', {});
-    // TODO: handle rejection & errors?
     async function readTemplate(template, folder, content = '') {
         return new Promise((resolve) => {
             const promises = [];
             const filenames = ['template', 'content'];
-            // Load the mustache template (outer layer)
             promises.push(fsPromise.readFile(`${folder}/${template}`, {
-                encoding: 'utf8'
+                encoding: 'utf8',
             }));
-            // Load the mustache content (innermost layer)
             promises.push(new Promise((resolve) => {
                 if (Array.isArray(content) && content[0])
                     content = content[0];
-                fsPromise.readFile(`${folder}/content/${content}.mustache`, {
-                    encoding: 'utf8'
-                }).then((result) => {
+                fsPromise
+                    .readFile(`${folder}/content/${content}.mustache`, {
+                    encoding: 'utf8',
+                })
+                    .then((result) => {
                     const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
-                    const styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
-                    const scripts = [...result.matchAll(scriptEx)].map(d => d[0]);
-                    const styles = [...result.matchAll(styleEx)].map(d => d[0]);
-                    resolve({
-                        content: result.replace(scriptEx, '').replace(styleEx, ''),
-                        scripts: scripts.join('\n'),
-                        styles: styles.join('\n')
+                    const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
+                    const scripts = [...result.matchAll(scriptEx)].map((d) => d[0]);
+                    const styles = [...result.matchAll(styleEx)].map((d) => d[0]);
+                    let styleData = styles.join('\n');
+                    sass.render({
+                        data: styleData,
+                        outputStyle: 'compressed',
+                    }, function (err, sassResult) {
+                        if (err) {
+                            console.error(`Error reading SCSS from file: ${folder}/content/${content}.mustache`);
+                            console.error(err);
+                        }
+                        else {
+                            styleData = sassResult.css.toString();
+                        }
+                        resolve({
+                            content: result.replace(scriptEx, '').replace(styleEx, ''),
+                            scripts: scripts.join('\n'),
+                            styles: `<style>${styleData}</style>`,
+                        });
                     });
-                }).catch(() => {
-                    fsPromise.readFile(`${folder}/404.mustache`, {
-                        encoding: 'utf8'
-                    }).then((result) => {
+                })
+                    .catch(() => {
+                    fsPromise
+                        .readFile(`${folder}/404.mustache`, {
+                        encoding: 'utf8',
+                    })
+                        .then((result) => {
                         resolve(result);
                     });
                 });
             }));
-            // Load all the other partials we may need
-            // Todo: Check folder exists and is not empty?
-            fsPromise.readdir(`${folder}/partials/`)
-                .then(function (d) {
+            fsPromise.readdir(`${folder}/partials/`).then(function (d) {
                 d.forEach(function (filename) {
                     if (filename.indexOf('.mustache') > 0) {
                         filenames.push(filename.split('.mustache')[0]);
                         promises.push(fsPromise.readFile(`${folder}/partials/${filename}`, {
-                            encoding: 'utf8'
+                            encoding: 'utf8',
                         }));
                     }
                 });
                 Promise.all(promises).then(function (array) {
                     const results = {};
-                    filenames.forEach((filename, i) => { results[filename] = array[i]; });
+                    filenames.forEach((filename, i) => {
+                        results[filename] = array[i];
+                    });
                     if (typeof results.content === 'object') {
                         results.scripts = results.content.scripts;
                         results.styles = results.content.styles;
@@ -306,25 +353,27 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
     }
     async function readAllViews(folder) {
         return new Promise((resolve, reject) => {
-            fsPromise.readdir(folder).then((directory) => {
+            fsPromise
+                .readdir(folder)
+                .then((directory) => {
                 Promise.all(directory.map((filename) => new Promise((resolve) => {
                     if (filename.indexOf('.mustache') > 0) {
-                        fsPromise.readFile(`${folder}/${filename}`, 'utf8')
+                        fsPromise
+                            .readFile(`${folder}/${filename}`, 'utf8')
                             .then((file) => {
                             const name = filename.split('.mustache')[0];
                             resolve({
-                                [name]: file
+                                [name]: file,
                             });
-                        }).catch((e) => console.log(e));
+                        })
+                            .catch((e) => console.log(e));
                     }
                     else {
                         fsPromise.lstat(`${folder}/${filename}`).then((d) => {
                             if (d.isDirectory()) {
-                                readAllViews(`${folder}/${filename}`)
-                                    .then(d => resolve(d));
+                                readAllViews(`${folder}/${filename}`).then((d) => resolve(d));
                             }
                             else {
-                                // console.log(`${filename} is not a folder`);
                                 resolve({});
                             }
                         });
@@ -335,7 +384,8 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                     console.log('Error in readAllViews', reason);
                     reject(reason);
                 });
-            }).catch((e) => console.log(e));
+            })
+                .catch((e) => console.log(e));
         });
     }
 });
@@ -349,19 +399,16 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
             try {
                 const data = {
                     cookies: {},
-                    words: []
+                    words: [],
                 };
                 if (request.headers.cookie) {
                     request.headers.cookie.split(';').forEach(function (d) {
-                        data.cookies[d.split('=')[0].trim()] = d.substring(d.split('=')[0].length + 1).trim();
+                        data.cookies[d.split('=')[0].trim()] = d
+                            .substring(d.split('=')[0].length + 1)
+                            .trim();
                     });
                 }
-                data.words = pathname
-                    .split('/');
-                // This should not be lowercase??? Keys are case sensitive!
-                // .map(function(d){
-                //     return d.toLowerCase();
-                // });
+                data.words = pathname.split('/');
                 resolve(data);
             }
             catch (err) {
@@ -369,36 +416,22 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 reject(err);
             }
         });
-        /**
-           * The router should check what sort of route we're doing, and act appropriately.
-           * Check:
-           * - Security
-           * - Redirects to outside websites
-           * - Internal page alias
-           * - Services / functions
-           * - /data/ folder might have a file
-           * - otherwise, we serve the file normally
-           *
-           * - When serving the file normally, we need to check the header to see if it can be zipped or should be zipped.
-           */
-        route.then(function (d) {
-            if (typeof website.security !== 'undefined' && website.security.loginNeeded(pathname, d.cookies)) {
+        route
+            .then(function (d) {
+            if (typeof website.security !== 'undefined' &&
+                website.security.loginNeeded(pathname, d.cookies)) {
                 website.services.login(response, request);
             }
             else {
-                // If a page substitution exists, substitute it.
                 if (typeof website.pages[d.words[1]] !== 'undefined') {
                     pathname = website.pages[d.words[1]];
                 }
-                // If there's a redirect, go to it
+                pathname = decodeURIComponent(pathname);
                 if (typeof website.redirects[pathname] !== 'undefined') {
                     redirect(website.redirects[pathname]);
-                    // if there's a service, use it
                 }
                 else if (typeof website.services[d.words[1]] === 'function') {
                     website.services[d.words[1]](response, request, website.seq, d.words[2]);
-                    // if there are controllers, call the right one
-                    // Note, this includes any top level mustache files, since they're loaded as generic, dataless controllers
                 }
                 else if (typeof website.controllers[d.words[1]] === 'function') {
                     website.controllers[d.words[1]]({
@@ -434,63 +467,62 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                                 else {
                                     response.end(result);
                                 }
-                            }
+                            },
                         },
                         req: request,
                         db: website.seq || null,
                         views: website.views,
                         readAllViews: website.readAllViews,
                         readTemplate: website.readTemplate,
-                        path: d.words.slice(2)
+                        path: d.words.slice(2),
                     });
-                    // if there is a matching data file
                 }
                 else if (website.data &&
                     fs.existsSync(website.data.concat(pathname)) &&
                     fs.lstatSync(website.data.concat(pathname)).isFile()) {
                     routeFile(website.data.concat(pathname));
-                    // if there is a matching .gz file in the data folder
                 }
                 else if (website.data &&
                     fs.existsSync(website.data.concat(pathname).concat('.gz'))) {
                     response.setHeader('Content-Encoding', 'gzip');
                     routeFile(website.data.concat(pathname, '.gz'));
-                    // if there is a matching compiled file
                 }
                 else if ((website.dist &&
                     fs.existsSync(website.dist.concat(pathname)) &&
-                    fs.lstatSync(website.dist.concat(pathname)).isFile()) || (website.dist &&
-                    fs.existsSync(website.dist.concat(pathname, '/index.html')) &&
-                    fs.lstatSync(website.dist.concat(pathname, '/index.html')).isFile())) {
+                    fs.lstatSync(website.dist.concat(pathname)).isFile()) ||
+                    (website.dist &&
+                        fs.existsSync(website.dist.concat(pathname, '/index.html')) &&
+                        fs.lstatSync(website.dist.concat(pathname, '/index.html')).isFile())) {
                     routeFile(website.dist.concat(pathname));
                 }
                 else {
-                    // Otherwise, route as normal to the public folder
                     routeFile(website.folder.concat(pathname));
                 }
             }
-        }).catch(renderError);
+        })
+            .catch(renderError);
         function renderError(d) {
             console.log('Error?', d);
             d = d
                 ? {
                     code: 500,
-                    message: JSON.stringify(d)
+                    message: JSON.stringify(d),
                 }
                 : {
                     code: 500,
-                    message: '500 Server Error'
+                    message: '500 Server Error',
                 };
             response.writeHead(d.code, {
-                'Content-Type': 'text/html'
+                'Content-Type': 'text/html',
             });
             response.end(d.message);
         }
         function redirect(url) {
-            if (typeof (url) === 'string') {
+            if (typeof url === 'string') {
                 console.log('Forwarding user to: ' + url);
                 response.writeHead(303, { 'Content-Type': 'text/html' });
-                response.end('<meta http-equiv="refresh" content="0; url=' + url + '">');
+                response.end(`<html><head><meta http-equiv="refresh" content="0;url='${url}'"></head>
+<body>Redirecting to: <a href='${url}'>${url}</a></body></html>`);
             }
             else {
                 console.log('Error, url missing');
@@ -498,15 +530,6 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 response.end('501 URL Not Found\n');
             }
         }
-        /**
-           * Given a filename, serve it.
-           *
-           * Check that the file exists
-           * Check the headers..?
-           * zip/unzip if needed
-           *
-           * @param filename
-           */
         function routeFile(filename) {
             fs.exists(filename, function (exists) {
                 if (!exists) {
@@ -517,7 +540,12 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 }
                 const acceptedEncoding = request.headers['accept-encoding'] || '';
                 const filetype = mime.getType(filename);
-                response.setHeader('Content-Type', filetype);
+                try {
+                    response.setHeader('Content-Type', filetype);
+                }
+                catch (e) {
+                    console.error(e);
+                }
                 let router = function (file) {
                     response.writeHead(200);
                     response.end(file);
@@ -530,16 +558,19 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                         return;
                     }
                     else {
-                        response.setHeader('Cache-Control', 'no-cache');
+                        try {
+                            response.setHeader('Cache-Control', 'no-cache');
+                        }
+                        catch (e) {
+                            console.error(e);
+                        }
                         if (website.cache) {
-                            if (stats.size > 10240) { // cache files bigger than 10kb?
-                                // https://web.dev/http-cache/
-                                response.setHeader('Cache-Control', 'public, max-age=600'); // store for 10 mins
-                                response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // expire 1 day from now
+                            if (stats.size > 10240) {
                                 try {
+                                    response.setHeader('Cache-Control', 'public, max-age=600');
+                                    response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString());
                                     const queryObject = url.parse(request.url, true).query;
                                     if (queryObject.v) {
-                                        // Set cache to 1 year if a cache busting query string is included
                                         response.setHeader('Cache-Control', 'public, max-age=31536000');
                                         response.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString());
                                     }
@@ -549,10 +580,16 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                                 }
                             }
                         }
-                        if (filetype && (filetype.slice(0, 4) === 'text' ||
-                            filetype === 'application/json' ||
-                            filetype === 'application/javascript')) {
-                            response.setHeader('Content-Type', `${filetype}; charset=UTF-8`);
+                        if (filetype &&
+                            (filetype.slice(0, 4) === 'text' ||
+                                filetype === 'application/json' ||
+                                filetype === 'application/javascript')) {
+                            try {
+                                response.setHeader('Content-Type', `${filetype}; charset=UTF-8`);
+                            }
+                            catch (e) {
+                                console.error(e);
+                            }
                             router = function (file) {
                                 if (acceptedEncoding.indexOf('gzip') >= 0) {
                                     zlib.gzip(file, function (err, result) {
@@ -589,19 +626,17 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 fs.readFile(filename, function (err, file) {
                     if (err) {
                         fs.readdir(filename, function (e, dir) {
-                            if (!e && dir && dir instanceof Array && dir.indexOf('index.html') >= 0) {
+                            if (!e &&
+                                dir &&
+                                dir instanceof Array &&
+                                dir.indexOf('index.html') >= 0) {
                                 if (filename.lastIndexOf('/') === filename.length - 1) {
                                     filename += 'index.html';
                                 }
                                 else {
-                                    if (filename.indexOf('?') !== -1) {
-                                        filename = filename.split('?')[0] + '/index.html';
-                                    }
-                                    else {
-                                        filename += '/index.html';
-                                    }
+                                    redirect(request.url.replace(/(^\/.*?)\/?(\?$|$)/, '$1/$2'));
+                                    return;
                                 }
-                                // Note we don't have content type, caching, or zipping!!!!
                                 fs.readFile(filename, (e, file) => router(file));
                             }
                             else {
@@ -646,9 +681,9 @@ define("socket", ["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.socketInit = void 0;
     function socketInit(io, handle) {
-        // console.log('Initialising Socket.io for site: ') // Which sites?
         Object.keys(handle.websites).forEach((siteName) => {
-            io.of(`/${siteName}`).use((socket, next) => {
+            io.of(`/${siteName}`)
+                .use((socket, next) => {
                 const host = socket.handshake.headers.host;
                 const website = handle.getWebsite(host);
                 if (website.name === siteName) {
@@ -657,11 +692,14 @@ define("socket", ["require", "exports"], function (require, exports) {
                 else {
                     next(new Error('Wrong namespace for this site'));
                 }
-            }).on('connection', function (socket) {
+            })
+                .on('connection', function (socket) {
                 const host = socket.handshake.headers.host;
                 const website = handle.getWebsite(host);
-                // Simple logging
-                console.log('Socket connection ' + socket.id + ' from ' + socket.handshake.headers.referer);
+                console.log('Socket connection ' +
+                    socket.id +
+                    ' from ' +
+                    socket.handshake.headers.referer);
                 website.sockets.on.forEach(function (d) {
                     socket.on(d.name, function (data) {
                         d.callback(socket, data, website.seq);
@@ -675,66 +713,67 @@ define("socket", ["require", "exports"], function (require, exports) {
     }
     exports.socketInit = socketInit;
 });
-define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "socket.io"], function (require, exports, socket_1, http, url, httpProxy, socketIO) {
+define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "socket.io", "formidable"], function (require, exports, socket_1, http, url, httpProxy, socket_io_1, formidable) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.start = void 0;
+    const socketIO = new socket_io_1.Server({});
     let blacklist = [];
     try {
         blacklist = require('../blacklist').blacklist;
         console.log('This is the blacklist:', blacklist);
     }
     catch (e) { }
-    // This part of the server starts the server on port 80 and logs stuff to the std.out
     function start(router, handle, port) {
         let server = null;
         function onRequest(request, response) {
+            const host = request.headers['x-host'] || request.headers.host;
             let spam = false;
-            const ip = request.headers['X-Real-IP'] || request.headers['x-real-ip'] || request.connection.remoteAddress;
+            const ip = request.headers['X-Real-IP'] ||
+                request.headers['x-real-ip'] ||
+                request.connection.remoteAddress;
             if (ip) {
-                blacklist.forEach(function (thing) {
-                    if (ip.includes(thing)) {
-                        spam = true;
-                        // console.log(`Spam request from ${ip}`);
-                        response.writeHead(403);
-                        response.end('Go away');
-                    }
-                });
+                if (!host || blacklist.some((thing) => ip.includes(thing))) {
+                    spam = true;
+                    response.writeHead(403);
+                    response.end('Go away');
+                }
             }
             if (!spam) {
-                const host = request.headers['test-host'] || request.headers.host;
-                const proxyConfig = handle.proxies[host];
-                const site = handle.getWebsite(host);
+                const hostname = host.split(':')[0];
+                const site = handle.getWebsite(hostname);
                 const urlObject = url.parse(request.url, true);
-                if (host !== 'www.monetiseyourwebsite.com') {
+                const proxies = handle.proxies[hostname];
+                const filterWord = url.parse(request.url).pathname.split('/')[1];
+                const proxy = proxies
+                    ? proxies[filterWord] || proxies['*'] || null
+                    : null;
+                if (proxy) {
+                    if (!proxy.silent)
+                        log();
+                    webProxy(proxy);
+                }
+                else {
+                    log();
+                    router(site, urlObject.pathname, response, request);
+                }
+                function log() {
                     console.log();
                     console.log(`Request for ${host}${urlObject.href} At ${getDateTime()} From ${ip}`);
                 }
-                if (proxyConfig &&
-                    (typeof proxyConfig.filter === 'undefined' ||
-                        proxyConfig.filter === url.parse(request.url).pathname.split('/')[1])) {
-                    if (typeof proxyConfig.passwords !== 'undefined' &&
-                        Array.isArray(proxyConfig.passwords)) {
-                        security(proxyConfig.passwords);
-                    }
-                    else {
-                        webProxy(proxyConfig);
-                    }
-                }
-                else {
-                    router(site, urlObject.pathname, response, request);
-                }
             }
             function webProxy(config) {
+                if (config.password) {
+                    const cookies = getCookies(request);
+                    if (cookies[`password${config.filter || ''}`] !== encode(config.password)) {
+                        loginPage(config.password, config.filter);
+                        return;
+                    }
+                }
                 const message = config.message || 'Error, server is down.';
                 const target = `http://${config.host || '127.0.0.1'}:${config.port || 80}`;
                 const proxyServer = httpProxy.createProxyServer({
-                    // preserveHeaderKeyCase: true,
-                    // autoRewrite: true,
-                    // followRedirects: true,
-                    // protocolRewrite: "http",
-                    // changeOrigin: true,
-                    target: target
+                    target: target,
                 });
                 proxyServer.on('error', function (err, req, res) {
                     'use strict';
@@ -749,64 +788,70 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
                 });
                 proxyServer.web(request, response);
             }
-            function security(passwords) {
-                let decodedCookiePassword = false;
-                const cookies = {};
-                if (request.headers.cookie) {
-                    request.headers.cookie.split(';').forEach(function (d) {
-                        cookies[d.split('=')[0].trim()] = d.substring(d.split('=')[0].length + 1).trim();
+            function loginPage(password, filter) {
+                if (request.url.indexOf('login') >= 0) {
+                    const form = new formidable.IncomingForm();
+                    form.parse(request, (err, fields) => {
+                        if (fields.password && fields.password === password) {
+                            const encodedPassword = encode(password);
+                            response.setHeader('Set-Cookie', [
+                                `password${filter || ''}=${encodedPassword};path=/;max-age=${24 * 60 * 60}`,
+                            ]);
+                            const url = `//${host}/${filter || ''}`;
+                            response.writeHead(303, { 'Content-Type': 'text/html' });
+                            response.end(`<html><head><meta http-equiv="refresh" content="0;url='${url}'"></head>
+<body>Login Successful, redirecting to: <a href='${url}'>${url}</a></body></html>`);
+                        }
+                        else {
+                            response.writeHead(401);
+                            response.end('Wrong password');
+                        }
                     });
-                    decodedCookiePassword = decodeBase64(cookies.password);
-                }
-                const host = request.headers['test-host'] || request.headers.host;
-                const urlObject = url.parse(request.url, true);
-                const proxyConfig = handle.proxies[host];
-                if (urlObject.query.logout) {
-                    response.setHeader('Set-Cookie', ['password=;path=/;max-age=1']);
-                    response.writeHead(200);
-                    response.end('Logged out.');
-                }
-                else if (urlObject.query.password && passwords.indexOf(urlObject.query.password) >= 0) {
-                    // console.log(url_object.query.password);
-                    const password = encodeBase64(urlObject.query.password[0]);
-                    // let password = encodeBase64(url_object.query.password);
-                    response.setHeader('Set-Cookie', [`password=${password};path=/;expires=false`]);
-                    webProxy(proxyConfig);
-                }
-                else if (decodedCookiePassword && passwords.indexOf(decodedCookiePassword) >= 0) {
-                    webProxy(proxyConfig);
                 }
                 else {
                     response.writeHead(200);
-                    response.end(simpleLoginPage);
+                    if (filter) {
+                        response.end(simpleLoginPage.replace('/login', `/${filter}/login`));
+                    }
+                    else {
+                        response.end(simpleLoginPage);
+                    }
                 }
             }
         }
         console.log('Server has started on port: ' + port);
         server = http.createServer(onRequest).listen(port);
-        // const io = new socketIO.listen(server, {})
         const io = socketIO.listen(server, {});
         socket_1.socketInit(io, handle);
         return server.on('upgrade', function (request, socket, head) {
             'use strict';
-            const host = request.headers['test-host'] || request.headers.host;
-            const proxyConfig = handle.proxies[host];
-            if (proxyConfig) {
-                httpProxy.createProxyServer({
+            let host = request.headers['x-host'] || request.headers.host;
+            host = host.split(':')[0];
+            const proxies = handle.proxies[host];
+            let filterWord = url.parse(request.url).pathname.split('/')[1];
+            if (proxies) {
+                let proxyConfig = null;
+                if (filterWord) {
+                    proxyConfig = proxies[filterWord];
+                }
+                else {
+                    proxyConfig = proxies['*'];
+                }
+                httpProxy
+                    .createProxyServer({
                     ws: true,
                     target: {
                         host: proxyConfig.host || '127.0.0.1',
-                        port: proxyConfig.port || 80
-                    }
-                }).ws(request, socket, head);
+                        port: proxyConfig.port || 80,
+                    },
+                })
+                    .ws(request, socket, head);
             }
         });
     }
     exports.start = start;
     function getDateTime() {
-        //    var date = new Date();
         const date = new Date(Date.now() + 36000000);
-        // add 10 hours... such a shitty way to make it australian time...
         let hour = date.getHours();
         hour = (hour < 10 ? '0' : '') + hour;
         let min = date.getMinutes();
@@ -818,22 +863,22 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
         day = (day < 10 ? '0' : '') + day;
         return year + ':' + month + ':' + day + ' ' + hour + ':' + min;
     }
-    function encodeBase64(string) {
-        'use strict';
-        // const buff = new Buffer(string)
-        const buff = Buffer.from(string);
-        return buff.toString('base64');
+    function getCookies(request) {
+        const cookies = {};
+        if (request.headers.cookie) {
+            request.headers.cookie.split(';').forEach(function (d) {
+                cookies[d.split('=')[0].trim()] = d
+                    .substring(d.split('=')[0].length + 1)
+                    .trim();
+            });
+        }
+        return cookies;
     }
-    function decodeBase64(data) {
+    const salt = Math.floor(Math.random() * 999);
+    function encode(string) {
         'use strict';
-        if (data) {
-            // const buff = new Buffer(data, 'base64')
-            const buff = Buffer.from(data, 'base64');
-            return buff.toString('ascii');
-        }
-        else {
-            return false;
-        }
+        const buff = Buffer.from(string);
+        return buff.toString('base64') + salt;
     }
     const simpleLoginPage = `<html>
 <head>
@@ -852,7 +897,7 @@ div {
 <body>
 <div>
     <h1>Enter Password</h1>
-    <form action="">
+    <form action="/login" method="post">
         <input type="password" placeholder="Enter Password" name="password" autofocus required>
         <button type="submit">Login</button>
     </form>
@@ -860,13 +905,12 @@ div {
 </body>
 </html>`;
 });
-// index.ts
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 define(function (require) {
     require(['server', 'router', 'requestHandlers', 'fs'], function (server, router, requestHandlers, fs) {
-        let port = '1337'; // change the port here?
+        let port = '1337';
         const pattern = /^\d{0,5}$/;
         let workspace = 'default';
         if (process.argv[2] !== null && pattern.exec(process.argv[2])) {
@@ -875,17 +919,21 @@ define(function (require) {
         else if (process.argv[3] !== null && pattern.exec(process.argv[3])) {
             port = process.argv[3];
         }
-        // Todo: we should check that the workspace exists, otherwise leave it as default
-        if (process.argv[2] !== null && process.argv[2] !== undefined && !pattern.exec(process.argv[2])) {
+        if (process.argv[2] !== null &&
+            process.argv[2] !== undefined &&
+            !pattern.exec(process.argv[2])) {
             workspace = process.argv[2];
         }
-        else if (process.argv[3] !== null && process.argv[3] !== undefined && !pattern.exec(process.argv[3])) {
+        else if (process.argv[3] !== null &&
+            process.argv[3] !== undefined &&
+            !pattern.exec(process.argv[3])) {
             workspace = process.argv[3];
         }
         if (fs.existsSync(`websites/${workspace}`)) {
             console.log(`Setting workspace to websites/${workspace}`);
         }
-        else if (fs.existsSync('config.js') || fs.existsSync('config/config.js')) {
+        else if (fs.existsSync('config.js') ||
+            fs.existsSync('config/config.js')) {
             console.log('Thalia running in stand alone mode.');
         }
         else {

@@ -24,6 +24,41 @@ interface options {
   separator: string;
 }
 
+const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
+const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+
+globalThis.score = score
+function score(seq: string): number {
+
+  seq = seq.split(' ')[1]  // remove the starting crRNA_
+           .slice(4)       // ignore the forward/reverse primer
+
+  let score = 0;
+  for (let i = 0; i < goodScore.length && i < seq.length; i++) {
+    if (seq[i] === goodScore[i]) {
+      score += 10;
+      if(i < 4) {
+        score += 10;
+      }
+    } else if (goodScore[i] === 'D' && seq[i] !== 'C') {
+      score += 5;
+    } else if (goodScore[i] === 'N') {
+      score += 1;
+    }
+    if (seq[i] === badScore[i] ) {
+      score -= 10;
+      if(i < 4) {
+        score -= 10;
+      }
+    } else if (badScore[i] === 'H' && seq[i] !== 'G') {
+      score -= 5;
+    } else if (badScore[i] === 'N') {
+      score -= 1;
+    }
+  }
+  return score;
+}
+
 // Display an example
 globalThis.showExample = showExample
 function showExample (): void {
@@ -32,6 +67,12 @@ function showExample (): void {
   $('#intervals').val(1)
   $('#forwardPrimer').val('cacc')
   $('#reversePrimer').val('caac')
+}
+
+globalThis.showSortedExample = function():void {
+  showExample();
+  // $('input#showForward').prop('checked', true);
+  submitSequence(true);
 }
 
 globalThis.clearResults = clearResults
@@ -71,7 +112,7 @@ function getOptions (): options {
 }
 
 globalThis.submitSequence = submitSequence
-function submitSequence (): void {
+function submitSequence (sorted:boolean = false): void {
   clearResults()
   $('#outputDiv').css('display', 'block')
 
@@ -132,11 +173,11 @@ function submitSequence (): void {
   const separator: string = options.separator === 'tabs' ? '\t' : ' '
 
   if (options.format === 'fasta') {
-    forwardsequence = forwardsequence.map((d, i) => `>gRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
-    reversesequence = reversesequence.map((d, i) => `>gRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
+    forwardsequence = forwardsequence.map((d, i) => `>crRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
+    reversesequence = reversesequence.map((d, i) => `>crRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
   } else {
-    forwardsequence = forwardsequence.map((d, i) => `gRNA_${i + 1}_F${separator}${d}`)
-    reversesequence = reversesequence.map((d, i) => `gRNA_${i + 1}_R${separator}${d}`)
+    forwardsequence = forwardsequence.map((d, i) => `crRNA_${i + 1}_F${separator}${d}`)
+    reversesequence = reversesequence.map((d, i) => `crRNA_${i + 1}_R${separator}${d}`)
   }
 
   if (options.lines === 'collate') {
@@ -150,6 +191,16 @@ function submitSequence (): void {
     for (let i = 0; i < forwardsequence.length; i++) {
       outputs.push(forwardsequence[i] + separator + reversesequence[i])
     }
+  }
+
+  // Score output
+  if(sorted) {
+    console.log("sorting!");
+    outputs = outputs.sort((a, b) => {
+      return score(b) - score(a)
+    }).map(d => {
+      return `${d} - ${score(d)}`
+    })
   }
 
   // Print output
