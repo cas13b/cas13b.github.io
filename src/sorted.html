@@ -16,7 +16,8 @@
 
   <body>
     <center>
-      <h1><font color="Red"> Cas13 </font>: Filtering</h1>
+      <h1><font color="Red">pspCas13b</font> crRNA design tool</h1>
+      <subtitle>Beta version</subtitle>
     </center>
 
     <center>
@@ -215,8 +216,17 @@
             </tr>
           </tbody>
         </table>
-        <input type="BUTTON" value="Show Example" onclick="showSortedExample()" />
-        <input type="BUTTON" value="Submit" onclick="submitSequence()" />
+        <!-- <input type="BUTTON" value="Show Example" onclick="showSortedExample()" /> -->
+        <input
+          type="BUTTON"
+          value="Show Sorted Example"
+          onclick="showSortedExample()"
+        />
+        <input
+          type="BUTTON"
+          value="Submit Sorted"
+          onclick="submitSequence(true)"
+        />
         <input type="RESET" value="Clear" onclick="clearResults()" />
       </form>
 

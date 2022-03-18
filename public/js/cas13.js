@@ -44,8 +44,10 @@ function showExample() {
     $('#reversePrimer').val('caac');
 }
 globalThis.showSortedExample = function () {
-    showExample();
-    // $('input#showForward').prop('checked', true);
+    $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
+    $('#spacerLength').val(30);
+    $('#intervals').val(1);
+    $('input#showForward').prop('checked', true);
     submitSequence(true);
 };
 globalThis.clearResults = clearResults;
@@ -157,6 +159,16 @@ function submitSequence(sorted = false) {
     if (sorted) {
         console.log("sorting!");
         outputs = outputs.sort((a, b) => {
+            return score(b) - score(a);
+        }).map(d => {
+            return `${d} - ${score(d)}`;
+        });
+        forwardsequence = forwardsequence.sort((a, b) => {
+            return score(b) - score(a);
+        }).map(d => {
+            return `${d} - ${score(d)}`;
+        });
+        reversesequence = reversesequence.sort((a, b) => {
             return score(b) - score(a);
         }).map(d => {
             return `${d} - ${score(d)}`;
