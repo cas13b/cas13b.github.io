@@ -12,6 +12,17 @@
     <script src="/js/vendor.min.js"></script>
     <script src="/js/showdown.min.js"></script>
     <script src="/js/bionode-seq.min.js"></script>
+    <style>
+      #outputTable {
+        border-collapse: collapse;
+        font-family:'Courier New', Courier, monospace;
+      }
+      #outputTable td,
+      #outputTable th {
+        border: solid 1px grey;
+        padding: 2px;
+      }
+    </style>
   </head>
 
   <body>
@@ -249,6 +260,14 @@
             >
           </p>
           <textarea id="output" rows="8" cols="100"></textarea>
+          <table id="outputTable">
+            <thead>
+              <th>ID</th>
+              <th>Sequence</th>
+              <th>Score</th>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
 
         <div id="extraOutputDiv" style="display: none">

@@ -215,6 +215,22 @@ function submitSequence(sorted = false) {
     }
     $('#statsDiv').css('display', 'block');
     $('#stats').val(stats.join('\n'));
+    // Print to table
+    printToTable(forwardsequence, reversesequence);
+}
+function printToTable(forwardsequence, reversesequence) {
+    console.log(forwardsequence);
+    d3.select("#outputTable tbody").selectAll("tr")
+        .data(forwardsequence)
+        .enter()
+        .append("tr")
+        .each((data, i, array) => {
+        var tr = d3.select(array[i]);
+        var d = data.replace(" - ", " ").split(" ");
+        tr.append("td").text(d[0]);
+        tr.append("td").selectAll("mark").data(d[1].split('')).enter().append("mark").text(d => d);
+        tr.append("td").text(d[2]);
+    });
 }
 globalThis.updateData = updateData;
 function updateData(link, data) {
