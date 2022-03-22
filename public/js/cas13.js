@@ -1,10 +1,29 @@
 const seq = require('bionode-seq');
 const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
 const badScore = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+const nucleicAcidNotation = {
+    'A': 'A',
+    'C': 'C',
+    'G': 'G',
+    'T': 'T',
+    'U': 'U',
+    'R': 'AG',
+    'Y': 'CT',
+    'S': 'GC',
+    'W': 'AT',
+    'K': 'GT',
+    'M': 'AC',
+    'B': 'CGT',
+    'D': 'AGT',
+    'H': 'ACT',
+    'V': 'ACG',
+    'N': 'ACGT',
+};
 globalThis.score = score;
 function score(seq) {
-    seq = seq.split(' ')[1] // remove the starting crRNA_
-        .slice(4); // ignore the forward/reverse primer
+    seq = seq.split(' ')[1]; // remove the starting crRNA_
+    //  .slice(4)       // ignore the forward/reverse primer
+    // Should ignore lowercase..?
     let score = 0;
     for (let i = 0; i < goodScore.length && i < seq.length; i++) {
         if (seq[i] === goodScore[i]) {
@@ -33,6 +52,30 @@ function score(seq) {
         }
     }
     return score;
+}
+function markup(seq) {
+    const result = [];
+    const seqArray = seq.split('');
+    seqArray.forEach((char, i) => {
+        var color = 'white';
+        if (nucleicAcidNotation[goodScore[i]].includes(char)) {
+            color = 'green';
+            if (nucleicAcidNotation[goodScore[i]].length > 1) {
+                color = 'yellow';
+            }
+            if (goodScore[i] == 'N') {
+                color = 'white';
+            }
+        }
+        else if (nucleicAcidNotation[badScore[i]].includes(char)) {
+            color = 'red';
+        }
+        result.push({
+            base: char,
+            color: color
+        });
+    });
+    return result;
 }
 // Display an example
 globalThis.showExample = showExample;
@@ -228,7 +271,13 @@ function printToTable(forwardsequence, reversesequence) {
         var tr = d3.select(array[i]);
         var d = data.replace(" - ", " ").split(" ");
         tr.append("td").text(d[0]);
-        tr.append("td").selectAll("mark").data(d[1].split('')).enter().append("mark").text(d => d);
+        tr.append("td")
+            .selectAll("mark")
+            .data(markup(d[1]))
+            .enter()
+            .append("mark")
+            .style('background', d => d.color)
+            .text(d => d.base);
         tr.append("td").text(d[2]);
     });
 }
