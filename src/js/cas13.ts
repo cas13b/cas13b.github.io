@@ -54,37 +54,6 @@ function score(seq:string) :number {
     return result + val.score
   }, 0)
 }
-// function score(seq: string): number {
-
-//   seq = seq.split(' ')[1]  // remove the starting crRNA_
-//           //  .slice(4)       // ignore the forward/reverse primer
-//           // Should ignore lowercase..?
-
-//   let score = 0;
-//   for (let i = 0; i < goodScore.length && i < seq.length; i++) {
-//     if (seq[i] === goodScore[i]) {
-//       score += 10;
-//       if(i < 4) {
-//         score += 10;
-//       }
-//     } else if (goodScore[i] === 'D' && seq[i] !== 'C') {
-//       score += 5;
-//     } else if (goodScore[i] === 'N') {
-//       score += 1;
-//     }
-//     if (seq[i] === badScore[i] ) {
-//       score -= 10;
-//       if(i < 4) {
-//         score -= 10;
-//       }
-//     } else if (badScore[i] === 'H' && seq[i] !== 'G') {
-//       score -= 5;
-//     } else if (badScore[i] === 'N') {
-//       score -= 1;
-//     }
-//   }
-//   return score;
-// }
 
 type markedupBase = {
   base: string;
@@ -92,29 +61,39 @@ type markedupBase = {
   score: number;
 }
 
+// Colors generated using https://www.sessions.edu/color-calculator/
+const colors = {
+  'green': '#87cc7a',
+  'yellow': '#f2d666',
+  'red': '#cc7a87',
+  'purple': '#be7acc',
+  'blue': '#6682f2',
+  'white': '#ffffff'
+}
+
 function markup(seq: string): markedupBase[] {
   const result :markedupBase[] = []
   const seqArray = seq.split('')
   seqArray.forEach((char, i) => {
-    var color = 'white'
+    var color = colors.white
     let score = 1
 
     if(nucleicAcidNotation[goodScore[i]].includes(char)) {
-      color = 'green'
+      color = colors.green
       score = 10
       if(i < 4) {
         score = 20
       }
       if(nucleicAcidNotation[goodScore[i]].length > 1) {
-        color = 'yellow'
+        color = colors.yellow
         score = 5
       }
       if(goodScore[i] == 'N') {
-        color = 'white'
+        color = colors.white
         score = 1
       }
     } else if(nucleicAcidNotation[badScore[i]].includes(char)) {
-      color = 'red'
+      color = colors.red
       score = -10
       if( i > 4 ) {
         score = -5

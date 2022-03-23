@@ -26,29 +26,38 @@ function score(seq) {
         return result + val.score;
     }, 0);
 }
+// Colors generated using https://www.sessions.edu/color-calculator/
+const colors = {
+    'green': '#87cc7a',
+    'yellow': '#f2d666',
+    'red': '#cc7a87',
+    'purple': '#be7acc',
+    'blue': '#6682f2',
+    'white': '#ffffff'
+};
 function markup(seq) {
     const result = [];
     const seqArray = seq.split('');
     seqArray.forEach((char, i) => {
-        var color = 'white';
+        var color = colors.white;
         let score = 1;
         if (nucleicAcidNotation[goodScore[i]].includes(char)) {
-            color = 'green';
+            color = colors.green;
             score = 10;
             if (i < 4) {
                 score = 20;
             }
             if (nucleicAcidNotation[goodScore[i]].length > 1) {
-                color = 'yellow';
+                color = colors.yellow;
                 score = 5;
             }
             if (goodScore[i] == 'N') {
-                color = 'white';
+                color = colors.white;
                 score = 1;
             }
         }
         else if (nucleicAcidNotation[badScore[i]].includes(char)) {
-            color = 'red';
+            color = colors.red;
             score = -10;
             if (i > 4) {
                 score = -5;
