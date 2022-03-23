@@ -1,6 +1,10 @@
 const seq = require('bionode-seq');
 const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
 const badScore = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+const bannedSequences = ['TTTT'];
+function filterBannedSequences(seq) {
+    return !bannedSequences.some(banned => seq.includes(banned));
+}
 const nucleicAcidNotation = {
     'A': 'A',
     'C': 'C',
@@ -178,6 +182,27 @@ function submitSequence(sorted = false) {
         forwardsequence = forwardsequence.map((d, i) => `crRNA_${i + 1}_F${separator}${d}`);
         reversesequence = reversesequence.map((d, i) => `crRNA_${i + 1}_R${separator}${d}`);
     }
+    // Score output
+    if (sorted) {
+        // console.log("sorting!");
+        // outputs = outputs.sort((a, b) => {
+        //   return score(b) - score(a)
+        // }).map(d => {
+        //   return `${d} - ${score(d)}`
+        // })
+        forwardsequence = forwardsequence
+            .filter(filterBannedSequences)
+            .sort((a, b) => {
+            return score(b) - score(a);
+        }).map(d => {
+            return `${d} - ${score(d)}`;
+        });
+        // reversesequence = reversesequence.sort((a, b) => {
+        //   return score(b) - score(a)
+        // }).map(d => {
+        //   return `${d} - ${score(d)}`
+        // })
+    }
     if (options.lines === 'collate') {
         for (let i = 0; i < forwardsequence.length; i++) {
             outputs.push(forwardsequence[i]);
@@ -191,25 +216,6 @@ function submitSequence(sorted = false) {
         for (let i = 0; i < forwardsequence.length; i++) {
             outputs.push(forwardsequence[i] + separator + reversesequence[i]);
         }
-    }
-    // Score output
-    if (sorted) {
-        console.log("sorting!");
-        outputs = outputs.sort((a, b) => {
-            return score(b) - score(a);
-        }).map(d => {
-            return `${d} - ${score(d)}`;
-        });
-        forwardsequence = forwardsequence.sort((a, b) => {
-            return score(b) - score(a);
-        }).map(d => {
-            return `${d} - ${score(d)}`;
-        });
-        reversesequence = reversesequence.sort((a, b) => {
-            return score(b) - score(a);
-        }).map(d => {
-            return `${d} - ${score(d)}`;
-        });
     }
     // Print output
     if (options.strandsShown === 'forward') {

@@ -27,6 +27,11 @@ interface options {
 const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
 const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
 
+const bannedSequences = ['TTTT']
+function filterBannedSequences(seq: string): boolean {
+  return !bannedSequences.some(banned => seq.includes(banned))
+}
+
 const nucleicAcidNotation = {
   'A': 'A',
   'C': 'C',
@@ -233,6 +238,31 @@ function submitSequence (sorted:boolean = false): void {
     reversesequence = reversesequence.map((d, i) => `crRNA_${i + 1}_R${separator}${d}`)
   }
 
+  // Score output
+  if(sorted) {
+    // console.log("sorting!");
+    // outputs = outputs.sort((a, b) => {
+    //   return score(b) - score(a)
+    // }).map(d => {
+    //   return `${d} - ${score(d)}`
+    // })
+
+    forwardsequence = forwardsequence
+    .filter(filterBannedSequences)
+    .sort((a, b) => {
+      return score(b) - score(a)
+    }).map(d => {
+      return `${d} - ${score(d)}`
+    })
+
+
+    // reversesequence = reversesequence.sort((a, b) => {
+    //   return score(b) - score(a)
+    // }).map(d => {
+    //   return `${d} - ${score(d)}`
+    // })
+  }
+
   if (options.lines === 'collate') {
     for (let i = 0; i < forwardsequence.length; i++) {
       outputs.push(forwardsequence[i])
@@ -244,29 +274,6 @@ function submitSequence (sorted:boolean = false): void {
     for (let i = 0; i < forwardsequence.length; i++) {
       outputs.push(forwardsequence[i] + separator + reversesequence[i])
     }
-  }
-
-  // Score output
-  if(sorted) {
-    console.log("sorting!");
-    outputs = outputs.sort((a, b) => {
-      return score(b) - score(a)
-    }).map(d => {
-      return `${d} - ${score(d)}`
-    })
-
-    forwardsequence = forwardsequence.sort((a, b) => {
-      return score(b) - score(a)
-    }).map(d => {
-      return `${d} - ${score(d)}`
-    })
-
-
-    reversesequence = reversesequence.sort((a, b) => {
-      return score(b) - score(a)
-    }).map(d => {
-      return `${d} - ${score(d)}`
-    })
   }
 
   // Print output
