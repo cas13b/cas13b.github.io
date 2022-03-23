@@ -8,6 +8,7 @@ exports.config = {
             "js/showdown.min.js",
             "js/vendor.min.js",
             "favicon.ico",
+            "sorted.html",
             "index.html"
         ]
     }
