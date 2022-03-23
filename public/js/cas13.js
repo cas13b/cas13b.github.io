@@ -102,6 +102,7 @@ function clearResults() {
     $('textarea#output').val('');
     $('textarea#extraOutput').val('');
     $('textarea#stats').val('');
+    d3.select('#outputTable tbody').selectAll('tr').data([]).exit().remove();
     setTimeout(function () {
         updateDisabledOptions();
     }, 50);
@@ -259,9 +260,9 @@ function submitSequence(sorted = false) {
     $('#statsDiv').css('display', 'block');
     $('#stats').val(stats.join('\n'));
     // Print to table
-    printToTable(forwardsequence, reversesequence);
+    printToTable(forwardsequence);
 }
-function printToTable(forwardsequence, reversesequence) {
+function printToTable(forwardsequence) {
     console.log(forwardsequence);
     d3.select("#outputTable tbody").selectAll("tr")
         .data(forwardsequence)

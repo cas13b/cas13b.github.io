@@ -145,6 +145,7 @@ function clearResults (): void {
   $('textarea#output').val('')
   $('textarea#extraOutput').val('')
   $('textarea#stats').val('')
+  d3.select('#outputTable tbody').selectAll('tr').data([]).exit().remove()
 
   setTimeout(function () {
     updateDisabledOptions()
@@ -319,10 +320,10 @@ function submitSequence (sorted:boolean = false): void {
 
   // Print to table
 
-  printToTable(forwardsequence, reversesequence)
+  printToTable(forwardsequence)
 }
 
-function printToTable(forwardsequence:string[], reversesequence) {
+function printToTable(forwardsequence:string[]) {
   console.log(forwardsequence)
   d3.select("#outputTable tbody").selectAll("tr")
   .data(forwardsequence)
