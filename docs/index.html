@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KRAS Annotation</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/cas13.css" />
+    <script src="/js/vendor.min.js"></script>
+    <script src="/js/showdown.min.js"></script>
+    <script src="/js/bionode-seq.min.js"></script>
+    <style>
+      #outputTable {
+        border-collapse: collapse;
+        font-family:'Courier New', Courier, monospace;
+      }
+      #outputTable td,
+      #outputTable th {
+        border: solid 1px grey;
+        padding: 2px;
+      }
+      mark {
+        padding: 0.1em 0.4em;
+        margin: 0 1px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <center>
+      <h1><font color="Red">pspCas13b</font> crRNA design tool</h1>
+      <subtitle>Beta version</subtitle>
+    </center>
+
+    <center>
+      <form enctype="multipart/form-data">
+        <table>
+          <tbody>
+            <tr>
+              <td align="left" colspan="2">
+                <h2>Input your RNA/DNA Sequence:</h2>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2">
+                <textarea
+                  name="fastaSequence"
+                  id="fastaSequence"
+                  rows="8"
+                  cols="100"
+                ></textarea>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">Spacer Length:</td>
+              <td align="left">
+                <input
+                  placeholder="30"
+                  type="TEXT"
+                  value=""
+                  name="forwardPrimer"
+                  id="spacerLength"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">Target Intervals (nt):</td>
+              <td align="left">
+                <input
+                  placeholder="1"
+                  type="TEXT"
+                  value=""
+                  name="forwardPrimer"
+                  id="intervals"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">5' Oligo Adapter:</td>
+              <td align="left">
+                <input
+                  type="TEXT"
+                  value=""
+                  name="forwardPrimer"
+                  id="forwardPrimer"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">3' Oligo Adapter:</td>
+              <td align="left">
+                <input
+                  type="TEXT"
+                  value=""
+                  name="reversePrimer"
+                  id="reversePrimer"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">Good Sequence:</td>
+              <td align="left">
+                <input
+                  type="TEXT"
+                  value="GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN"
+                  name="goodString"
+                  id="goodString"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">Bad Sequence:</td>
+              <td align="left">
+                <input
+                  type="TEXT"
+                  value="CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN"
+                  name="badString"
+                  id="badString"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center">Banned Sequences:</td>
+              <td align="left">
+                <input
+                  type="TEXT"
+                  value="TTTT"
+                  name="bannedSeq"
+                  id="bannedSeq"
+                  size="75"
+                />
+              </td>
+            </tr>
+
+            <!-- 
+    <tr>
+    <td align="center"> E-mail address (optional):</td>
+    <td align="left"> <input type="TEXT" value="" name="REPLY-E-MAIL" size="40"></td>
+    </tr>
+-->
+
+            <tr>
+              <td id="advancedOptionsButton" colspan="2">
+                <a
+                  href="#advanced"
+                  onclick="$('#advancedOptions').toggleClass('hidden')"
+                  >Advanced Options</a
+                >
+              </td>
+            </tr>
+
+            <tr id="advancedOptions" class="hidden">
+              <td colspan="2">
+                <!-- Make forward or reverse optional -->
+                <div class="option">
+                  <input
+                    type="radio"
+                    id="showBoth"
+                    name="strandsShown"
+                    value="both"
+                    checked="true"
+                  />
+                  <label for="showBoth">Show both</label><br />
+                  <input
+                    type="radio"
+                    id="showForward"
+                    name="strandsShown"
+                    value="forward"
+                  />
+                  <label for="showForward">Forward Strand</label><br />
+                  <input
+                    type="radio"
+                    id="showReverse"
+                    name="strandsShown"
+                    value="reverse"
+                  />
+                  <label for="showReverse">Reverse Strand</label><br />
+                </div>
+
+                <div class="option">
+                  <input
+                    type="radio"
+                    id="classicRadio"
+                    name="format"
+                    value="classic"
+                    checked="true"
+                  />
+                  <label for="classicRadio">Classic format</label><br />
+                  <input
+                    type="radio"
+                    id="fastaRadio"
+                    name="format"
+                    value="fasta"
+                  />
+                  <label for="fastaRadio">Fasta format</label><br />
+                </div>
+
+                <div class="option" style="width: 35%">
+                  <input
+                    type="radio"
+                    id="collateRadio"
+                    name="lines"
+                    value="collate"
+                    checked="true"
+                  />
+                  <label for="collateRadio"
+                    >Collate forward and reverse primers </label
+                  ><br />
+                  <input
+                    type="radio"
+                    id="separateRadio"
+                    name="lines"
+                    value="separate"
+                  />
+                  <label for="separateRadio"
+                    >Forward primers, then reverse primers</label
+                  ><br />
+                  <input
+                    type="radio"
+                    id="doubleRadio"
+                    name="lines"
+                    value="double"
+                  />
+                  <label for="doubleRadio">Both primers on the same line</label
+                  ><br />
+                  <input
+                    type="radio"
+                    id="filesRadio"
+                    name="lines"
+                    value="files"
+                  />
+                  <label for="filesRadio">Separate output files</label><br />
+                </div>
+
+                <div class="option" style="width: 15%">
+                  <input
+                    type="radio"
+                    id="spacesRadio"
+                    name="separator"
+                    value="spaces"
+                    checked="true"
+                  />
+                  <label for="spacesRadio">Spaces</label><br />
+                  <input
+                    type="radio"
+                    id="tabsRadio"
+                    name="separator"
+                    value="tabs"
+                  />
+                  <label for="tabsRadio">Tabs</label><br />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- <input type="BUTTON" value="Show Example" onclick="showSortedExample()" /> -->
+        <input
+          type="BUTTON"
+          value="Show Example"
+          onclick="showSortedExample()"
+        />
+        <input
+          type="BUTTON"
+          value="Submit"
+          onclick="submitSequence(true)"
+        />
+        <input type="RESET" value="Clear" onclick="clearResults()" />
+      </form>
+
+      <div id="outputs">
+        <div id="errorsDiv" style="display: none">
+          <h2 style="color: red">Errors:</h2>
+          <textarea id="errors" rows="8" cols="100"></textarea>
+        </div>
+
+        <div id="outputDiv" style="display: none">
+          <h2>Output:</h2>
+          <p>
+            <a
+              id="downloadCsv"
+              onclick="updateData('#downloadCsv', '#output')"
+              target="_blank"
+              href="#results.txt"
+              download="results.txt"
+              >Download as .txt file</a
+            >
+          </p>
+          <textarea id="output" rows="8" cols="100" style="display: none;"></textarea>
+          <table id="outputTable">
+            <thead>
+              <th>ID</th>
+              <th>Sequence</th>
+              <th>Score</th>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="extraOutputDiv" style="display: none">
+          <h2>Reverse Output:</h2>
+          <p>
+            <a
+              id="downloadExtraCsv"
+              onclick="updateData('#downloadExtraCsv', '#extraOutput')"
+              target="_blank"
+              href="#reverse.txt"
+              download="reverse.txt"
+              >Download as .txt file</a
+            >
+          </p>
+          <textarea id="extraOutput" rows="8" cols="100"></textarea>
+        </div>
+
+        <div id="statsDiv" style="display: none">
+          <h2>Stats:</h2>
+          <textarea id="stats" rows="8" cols="100"></textarea>
+
+          <div id="chartDiv">
+            <h2>GC content of generated guide RNA:</h2>
+            <svg id="chart" viewBox="0 0 900 600"></svg>
+          </div>
+        </div>
+      </div>
+
+      <br />
+      <p>
+        <b>If you are using Cas13-gRNA server in your research, please cite:</b>
+        <br />
+        XXXXX, (Under review).
+      </p>
+
+      <center>
+        <p>
+          <font size="0.5">
+            Copyright @ 2020 Peter MacCallum Cancer Centre, Australia.
+          </font>
+        </p>
+      </center>
+    </center>
+
+    <script src="/js/cas13.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-76178877-2"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'UA-76178877-2')
+    </script>
+  </body>
+</html>

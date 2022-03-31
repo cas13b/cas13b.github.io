@@ -1,0 +1,63 @@
+textarea {
+  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5em;
+  margin: 0;
+}
+
+td#advancedOptionsButton {
+  text-align: center;
+  line-height: 2em;
+}
+
+tr#advancedOptions label, tr#advancedOptions input {
+  cursor: pointer;
+}
+tr#advancedOptions input[disabled] {
+  cursor: not-allowed;
+}
+tr#advancedOptions input[disabled] + label {
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+tr#advancedOptions.hidden {
+  display: none;
+}
+tr#advancedOptions td div.option {
+  padding: 0 10px;
+  width: 25%;
+  float: left;
+}
+
+div#outputs {
+  margin: auto;
+}
+div#outputs p {
+  margin: 0;
+}
+div#outputs.double div#output_div {
+  float: left;
+  width: 50%;
+  padding: 0 5px;
+}
+div#outputs.double div#output_div textarea {
+  width: 100%;
+}
+div#outputs.double div#extra_output_div {
+  float: left;
+  width: 50%;
+  padding: 0 5px;
+}
+div#outputs.double div#extra_output_div textarea {
+  width: 100%;
+}
+
+#chart_div {
+  width: 900px;
+  margin: auto;
+  text-align: center;
+}
