@@ -1,7 +1,14 @@
 const seq = require('bionode-seq');
-const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
-const badScore = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
-const bannedSequences = ['TTTT'];
+// const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
+// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+// const bannedSequences = ['TTTT']
+let goodScore, badScore, bannedSequences;
+refreshSequences();
+function refreshSequences() {
+    goodScore = $('#goodString').val().split('');
+    badScore = $('#badString').val().split('');
+    bannedSequences = $('#bannedSeq').val().split(',').map(s => s.trim());
+}
 function filterBannedSequences(seq) {
     return !bannedSequences.some(banned => seq.includes(banned));
 }
@@ -129,11 +136,13 @@ function submitSequence(sorted = false) {
     const options = getOptions();
     const errors = [];
     // Calculate sequences
+    // Read input
     const sequence = `${$('#fastaSequence').val()}`.toUpperCase();
     const forwardPrimer = `${$('#forwardPrimer').val()}`.toLowerCase();
     const reversePrimer = `${$('#reversePrimer').val()}`.toLowerCase();
     let spacerLength = parseInt(`${$('#spacerLength').val()}`);
     let intervals = parseInt(`${$('#intervals').val()}`);
+    refreshSequences();
     let outputs = [];
     let forwardsequence = [];
     let reversesequence = [];
