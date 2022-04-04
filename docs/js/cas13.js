@@ -84,14 +84,12 @@ globalThis.showExample = showExample;
 function showExample() {
     $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $('#spacerLength').val(30);
-    $('#intervals').val(1);
     $('#forwardPrimer').val('cacc');
     $('#reversePrimer').val('caac');
 }
 globalThis.showSortedExample = function () {
     $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $('#spacerLength').val(30);
-    $('#intervals').val(1);
     $('input#showForward').prop('checked', true);
     submitSequence(true);
 };
@@ -138,7 +136,6 @@ function submitSequence(sorted = false) {
     const forwardPrimer = `${$('#forwardPrimer').val()}`.toLowerCase();
     const reversePrimer = `${$('#reversePrimer').val()}`.toLowerCase();
     let spacerLength = parseInt(`${$('#spacerLength').val()}`);
-    let intervals = parseInt(`${$('#intervals').val()}`);
     refreshSequences();
     let outputs = [];
     let forwardsequence = [];
@@ -146,13 +143,6 @@ function submitSequence(sorted = false) {
     let pos = 0;
     if ($('#spacerLength').val() === '')
         spacerLength = 30;
-    if ($('#intervals').val() === '')
-        intervals = 1;
-    if ((!Number.isInteger(intervals) && $('#intervals').val() !== '') || intervals < 1 || parseInt(`${$('#intervals').val()}`) === 0) {
-        const message = "Intervals must be an integer 1 or greater, setting 'intervals' to 1.";
-        errors.push(message);
-        intervals = 1;
-    }
     if ((!Number.isInteger(spacerLength) && $('#spacerLength').val() !== '') || spacerLength < 1 || parseInt(`${$('#spacerLength').val()}`) === 0) {
         const message = "Spacer Length must be an integer 1 or greater, setting 'spacerLength' to 1.";
         errors.push(message);
@@ -172,7 +162,7 @@ function submitSequence(sorted = false) {
             forwardsequence.push(`${forwardPrimer}${seq.reverse(seq.complement(match))}`);
             reversesequence.push(`${reversePrimer}${match}`);
         }
-        pos += intervals;
+        pos++;
     }
     // Save sequences to #output for charting purposes
     d3.select('#output').datum({

@@ -71,20 +71,6 @@
             </tr>
 
             <tr>
-              <td align="center">Target Intervals (nt):</td>
-              <td align="left">
-                <input
-                  placeholder="1"
-                  type="TEXT"
-                  value=""
-                  name="forwardPrimer"
-                  id="intervals"
-                  size="75"
-                />
-              </td>
-            </tr>
-
-            <tr>
               <td align="center">5' Oligo Adapter:</td>
               <td align="left">
                 <input
@@ -137,7 +123,7 @@
             </tr>
 
             <tr>
-              <td align="center">Banned Sequences:</td>
+              <td align="center">Filtered Motifs:</td>
               <td align="left">
                 <input
                   type="TEXT"
@@ -331,11 +317,6 @@
         <div id="statsDiv" style="display: none">
           <h2>Stats:</h2>
           <textarea id="stats" rows="8" cols="100"></textarea>
-
-          <div id="chartDiv">
-            <h2>GC content of generated guide RNA:</h2>
-            <svg id="chart" viewBox="0 0 900 600"></svg>
-          </div>
         </div>
       </div>
 

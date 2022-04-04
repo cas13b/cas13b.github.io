@@ -1,6 +1,6 @@
 const seq = require('bionode-seq');
 // const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
-// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNNN'.split('');
 // const bannedSequences = ['TTTT']
 let goodScore, badScore, bannedSequences;
 refreshSequences();
@@ -28,7 +28,8 @@ const nucleicAcidNotation = {
     'D': 'AGT',
     'H': 'ACT',
     'V': 'ACG',
-    'N': 'ACGT',
+    'N': '',
+    // 'N': 'ACGT',
 };
 globalThis.score = score;
 function score(seq) {
@@ -51,7 +52,7 @@ function markup(seq) {
     const seqArray = seq.split('');
     seqArray.forEach((char, i) => {
         var color = colors.white;
-        let score = 1;
+        let score = 0;
         if (nucleicAcidNotation[goodScore[i]].includes(char)) {
             color = colors.green;
             score = 10;
@@ -62,12 +63,8 @@ function markup(seq) {
                 color = colors.yellow;
                 score = 5;
             }
-            if (goodScore[i] == 'N') {
-                color = colors.white;
-                score = 1;
-            }
         }
-        else if (nucleicAcidNotation[badScore[i]].includes(char)) {
+        if (nucleicAcidNotation[badScore[i]].includes(char)) {
             color = colors.red;
             score = -10;
             if (i > 4) {
@@ -87,14 +84,12 @@ globalThis.showExample = showExample;
 function showExample() {
     $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $('#spacerLength').val(30);
-    $('#intervals').val(1);
     $('#forwardPrimer').val('cacc');
     $('#reversePrimer').val('caac');
 }
 globalThis.showSortedExample = function () {
     $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG');
     $('#spacerLength').val(30);
-    $('#intervals').val(1);
     $('input#showForward').prop('checked', true);
     submitSequence(true);
 };
@@ -141,7 +136,6 @@ function submitSequence(sorted = false) {
     const forwardPrimer = `${$('#forwardPrimer').val()}`.toLowerCase();
     const reversePrimer = `${$('#reversePrimer').val()}`.toLowerCase();
     let spacerLength = parseInt(`${$('#spacerLength').val()}`);
-    let intervals = parseInt(`${$('#intervals').val()}`);
     refreshSequences();
     let outputs = [];
     let forwardsequence = [];
@@ -149,23 +143,17 @@ function submitSequence(sorted = false) {
     let pos = 0;
     if ($('#spacerLength').val() === '')
         spacerLength = 30;
-    if ($('#intervals').val() === '')
-        intervals = 1;
-    if ((!Number.isInteger(intervals) && $('#intervals').val() !== '') || intervals < 1 || parseInt(`${$('#intervals').val()}`) === 0) {
-        const message = "Intervals must be an integer 1 or greater, setting 'intervals' to 1.";
-        errors.push(message);
-        intervals = 1;
-    }
     if ((!Number.isInteger(spacerLength) && $('#spacerLength').val() !== '') || spacerLength < 1 || parseInt(`${$('#spacerLength').val()}`) === 0) {
         const message = "Spacer Length must be an integer 1 or greater, setting 'spacerLength' to 1.";
         errors.push(message);
         spacerLength = 1;
     }
-    if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
+    // if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
+    if (seq.checkType(sequence, 1) === 'dna') {
         // console.log("Sequence is fine, no errors.");
     }
     else {
-        const message = 'Input sequence is not DNA or RNA';
+        const message = 'Input sequence is not DNA, please check your sequence.';
         errors.push(message);
     }
     while (pos < sequence.length) {
@@ -174,14 +162,14 @@ function submitSequence(sorted = false) {
             forwardsequence.push(`${forwardPrimer}${seq.reverse(seq.complement(match))}`);
             reversesequence.push(`${reversePrimer}${match}`);
         }
-        pos += intervals;
+        pos++;
     }
     // Save sequences to #output for charting purposes
     d3.select('#output').datum({
         forwardsequence: forwardsequence,
         reversesequence: reversesequence
     });
-    drawChart();
+    // drawChart()
     // Apply options
     const separator = options.separator === 'tabs' ? '\t' : ' ';
     if (options.format === 'fasta') {
@@ -253,6 +241,10 @@ function submitSequence(sorted = false) {
         $('#errorsDiv').css('display', 'block');
         $('#errors').val(errors.join('\n'));
     }
+    else {
+        // Print to table
+        printToTable(forwardsequence);
+    }
     // Print stats
     const stats = [];
     stats.push(`Sequence length: ${sequence.length}`);
@@ -268,11 +260,9 @@ function submitSequence(sorted = false) {
     }
     $('#statsDiv').css('display', 'block');
     $('#stats').val(stats.join('\n'));
-    // Print to table
-    printToTable(forwardsequence);
 }
 function printToTable(forwardsequence) {
-    console.log(forwardsequence);
+    // console.log(forwardsequence)
     d3.select("#outputTable tbody").selectAll("tr")
         .data(forwardsequence)
         .enter()

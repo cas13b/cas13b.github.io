@@ -127,7 +127,6 @@ globalThis.showExample = showExample
 function showExample (): void {
   $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
   $('#spacerLength').val(30)
-  $('#intervals').val(1)
   $('#forwardPrimer').val('cacc')
   $('#reversePrimer').val('caac')
 }
@@ -135,7 +134,6 @@ function showExample (): void {
 globalThis.showSortedExample = function():void {
   $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
   $('#spacerLength').val(30)
-  $('#intervals').val(1)
   $('input#showForward').prop('checked', true);
   submitSequence(true);
 }
@@ -191,7 +189,6 @@ function submitSequence (sorted:boolean = false): void {
   const forwardPrimer: string = `${$('#forwardPrimer').val()}`.toLowerCase()
   const reversePrimer: string = `${$('#reversePrimer').val()}`.toLowerCase()
   let spacerLength: number = parseInt(`${$('#spacerLength').val()}`)
-  let intervals: number = parseInt(`${$('#intervals').val()}`)
   refreshSequences()
 
   let outputs: string[] = []
@@ -200,13 +197,6 @@ function submitSequence (sorted:boolean = false): void {
   let pos: number = 0
 
   if ($('#spacerLength').val() === '') spacerLength = 30
-  if ($('#intervals').val() === '') intervals = 1
-
-  if ((!Number.isInteger(intervals) && $('#intervals').val() !== '') || intervals < 1 || parseInt(`${$('#intervals').val()}`) === 0) {
-    const message = "Intervals must be an integer 1 or greater, setting 'intervals' to 1."
-    errors.push(message)
-    intervals = 1
-  }
 
   if ((!Number.isInteger(spacerLength) && $('#spacerLength').val() !== '') || spacerLength < 1 || parseInt(`${$('#spacerLength').val()}`) === 0) {
     const message: string = "Spacer Length must be an integer 1 or greater, setting 'spacerLength' to 1."
@@ -228,7 +218,7 @@ function submitSequence (sorted:boolean = false): void {
       forwardsequence.push(`${forwardPrimer}${seq.reverse(seq.complement(match))}`)
       reversesequence.push(`${reversePrimer}${match}`)
     }
-    pos += intervals
+    pos++
   }
 
   // Save sequences to #output for charting purposes
