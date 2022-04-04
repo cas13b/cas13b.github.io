@@ -25,7 +25,7 @@ interface options {
 }
 
 // const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
-// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNNN'.split('');
 // const bannedSequences = ['TTTT']
 
 let goodScore, badScore, bannedSequences
@@ -57,7 +57,8 @@ const nucleicAcidNotation = {
   'D': 'AGT',
   'H': 'ACT',
   'V': 'ACG',
-  'N': 'ACGT',
+  'N': '',
+  // 'N': 'ACGT',
 }
 
 globalThis.score = score
@@ -90,7 +91,7 @@ function markup(seq: string): markedupBase[] {
   const seqArray = seq.split('')
   seqArray.forEach((char, i) => {
     var color = colors.white
-    let score = 1
+    let score = 0
 
     if(nucleicAcidNotation[goodScore[i]].includes(char)) {
       color = colors.green
@@ -102,11 +103,8 @@ function markup(seq: string): markedupBase[] {
         color = colors.yellow
         score = 5
       }
-      if(goodScore[i] == 'N') {
-        color = colors.white
-        score = 1
-      }
-    } else if(nucleicAcidNotation[badScore[i]].includes(char)) {
+    }
+    if(nucleicAcidNotation[badScore[i]].includes(char)) {
       color = colors.red
       score = -10
       if( i > 4 ) {
@@ -335,7 +333,7 @@ function submitSequence (sorted:boolean = false): void {
 }
 
 function printToTable(forwardsequence:string[]) {
-  console.log(forwardsequence)
+  // console.log(forwardsequence)
   d3.select("#outputTable tbody").selectAll("tr")
   .data(forwardsequence)
   .enter()

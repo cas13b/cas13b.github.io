@@ -1,6 +1,6 @@
 const seq = require('bionode-seq');
 // const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
-// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNHN'.split('');
+// const badScore  = 'CCCCNNNNNNCCNNCCCHNNNNNNNNNNNN'.split('');
 // const bannedSequences = ['TTTT']
 let goodScore, badScore, bannedSequences;
 refreshSequences();
@@ -28,7 +28,8 @@ const nucleicAcidNotation = {
     'D': 'AGT',
     'H': 'ACT',
     'V': 'ACG',
-    'N': 'ACGT',
+    'N': '',
+    // 'N': 'ACGT',
 };
 globalThis.score = score;
 function score(seq) {
@@ -51,7 +52,7 @@ function markup(seq) {
     const seqArray = seq.split('');
     seqArray.forEach((char, i) => {
         var color = colors.white;
-        let score = 1;
+        let score = 0;
         if (nucleicAcidNotation[goodScore[i]].includes(char)) {
             color = colors.green;
             score = 10;
@@ -62,12 +63,8 @@ function markup(seq) {
                 color = colors.yellow;
                 score = 5;
             }
-            if (goodScore[i] == 'N') {
-                color = colors.white;
-                score = 1;
-            }
         }
-        else if (nucleicAcidNotation[badScore[i]].includes(char)) {
+        if (nucleicAcidNotation[badScore[i]].includes(char)) {
             color = colors.red;
             score = -10;
             if (i > 4) {
@@ -272,7 +269,7 @@ function submitSequence(sorted = false) {
     printToTable(forwardsequence);
 }
 function printToTable(forwardsequence) {
-    console.log(forwardsequence);
+    // console.log(forwardsequence)
     d3.select("#outputTable tbody").selectAll("tr")
         .data(forwardsequence)
         .enter()
