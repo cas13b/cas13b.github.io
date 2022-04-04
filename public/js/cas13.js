@@ -5,9 +5,12 @@ const seq = require('bionode-seq');
 let goodScore, badScore, bannedSequences;
 refreshSequences();
 function refreshSequences() {
-    goodScore = $('#goodString').val().split('');
-    badScore = $('#badString').val().split('');
-    bannedSequences = $('#bannedSeq').val().split(',').map(s => s.trim());
+    goodScore = `${$('#goodString').val()}`.replaceAll(" ", "").split('');
+    badScore = `${$('#badString').val()}`.replaceAll(" ", "").split('');
+    bannedSequences = `${$('#bannedSeq').val()}`.replaceAll(" ", "").split(',').map(s => s.trim());
+    $('#goodString').val(goodScore.join(''));
+    $('#badString').val(badScore.join(''));
+    $('#bannedSeq').val(bannedSequences.join(', '));
 }
 function filterBannedSequences(seq) {
     return !bannedSequences.some(banned => seq.includes(banned));
@@ -132,7 +135,7 @@ function submitSequence(sorted = false) {
     const errors = [];
     // Calculate sequences
     // Read input
-    const sequence = `${$('#fastaSequence').val()}`.toUpperCase();
+    const sequence = `${$('#fastaSequence').val()}`.toUpperCase().replaceAll(" ", "");
     const forwardPrimer = `${$('#forwardPrimer').val()}`.toLowerCase();
     const reversePrimer = `${$('#reversePrimer').val()}`.toLowerCase();
     let spacerLength = parseInt(`${$('#spacerLength').val()}`);

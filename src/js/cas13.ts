@@ -32,9 +32,13 @@ let goodScore, badScore, bannedSequences
 
 refreshSequences()
 function refreshSequences() {
-  goodScore = ($('#goodString').val() as string).split('')
-  badScore  = ($('#badString').val() as string).split('')
-  bannedSequences = ($('#bannedSeq').val() as string).split(',').map(s => s.trim())
+  goodScore = `${$('#goodString').val()}`.replaceAll(" ", "").split('')
+  badScore  = `${$('#badString').val()}`.replaceAll(" ", "").split('')
+  bannedSequences = `${$('#bannedSeq').val()}`.replaceAll(" ", "").split(',').map(s => s.trim())
+
+  $('#goodString').val(goodScore.join(''))
+  $('#badString').val(badScore.join(''))
+  $('#bannedSeq').val(bannedSequences.join(', '))
 }
 
 function filterBannedSequences(seq: string): boolean {
@@ -185,7 +189,7 @@ function submitSequence (sorted:boolean = false): void {
 
   // Calculate sequences
   // Read input
-  const sequence: string = `${$('#fastaSequence').val()}`.toUpperCase()
+  const sequence: string = `${$('#fastaSequence').val()}`.toUpperCase().replaceAll(" ", "")
   const forwardPrimer: string = `${$('#forwardPrimer').val()}`.toLowerCase()
   const reversePrimer: string = `${$('#reversePrimer').val()}`.toLowerCase()
   let spacerLength: number = parseInt(`${$('#spacerLength').val()}`)

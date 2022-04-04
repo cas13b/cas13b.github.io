@@ -147,7 +147,7 @@
         "affectsGlobalScope": true
       },
       "./src/js/cas13.ts": {
-        "version": "854bfab74ce4df7b8bbb48efe457d376fcec6e368dd3c28ae006ece31913ba2d",
+        "version": "dfd3a186c33ee95172cf12b183dd63b8d7c3d087f6dfc069d7dc912d57acab8b",
         "signature": "263f1285b430db1d1f4f4812faac251fa58794f12b1205ee6ea4dfcdfc61bdd4",
         "affectsGlobalScope": true
       },
@@ -2652,7 +2652,43 @@
       "../../node_modules/.pnpm/querystring@0.2.1/node_modules/querystring/decode.d.ts",
       "../../node_modules/.pnpm/querystring@0.2.1/node_modules/querystring/encode.d.ts",
       "../../node_modules/.pnpm/querystring@0.2.1/node_modules/querystring/index.d.ts",
-      "./src/js/cas13.ts"
+      [
+        "./src/js/cas13.ts",
+        [
+          {
+            "file": "./src/js/cas13.ts",
+            "start": 670,
+            "length": 10,
+            "code": 2550,
+            "category": 1,
+            "messageText": "Property 'replaceAll' does not exist on type 'string'. Do you need to change your target library? Try changing the `lib` compiler option to 'esnext' or later."
+          },
+          {
+            "file": "./src/js/cas13.ts",
+            "start": 741,
+            "length": 10,
+            "code": 2550,
+            "category": 1,
+            "messageText": "Property 'replaceAll' does not exist on type 'string'. Do you need to change your target library? Try changing the `lib` compiler option to 'esnext' or later."
+          },
+          {
+            "file": "./src/js/cas13.ts",
+            "start": 818,
+            "length": 10,
+            "code": 2550,
+            "category": 1,
+            "messageText": "Property 'replaceAll' does not exist on type 'string'. Do you need to change your target library? Try changing the `lib` compiler option to 'esnext' or later."
+          },
+          {
+            "file": "./src/js/cas13.ts",
+            "start": 5132,
+            "length": 10,
+            "code": 2550,
+            "category": 1,
+            "messageText": "Property 'replaceAll' does not exist on type 'string'. Do you need to change your target library? Try changing the `lib` compiler option to 'esnext' or later."
+          }
+        ]
+      ]
     ]
   },
   "version": "4.2.4"

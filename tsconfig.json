@@ -14,7 +14,7 @@
     "noImplicitThis": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
-    "lib": [ "es6", "dom.iterable", "dom"]
+    "lib": [ "es6", "dom.iterable", "dom", "ES2021.String"]
   },
   "include": [
     "src/**/*"
