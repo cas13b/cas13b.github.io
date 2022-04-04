@@ -158,11 +158,12 @@ function submitSequence(sorted = false) {
         errors.push(message);
         spacerLength = 1;
     }
-    if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
+    // if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
+    if (seq.checkType(sequence, 1) === 'dna') {
         // console.log("Sequence is fine, no errors.");
     }
     else {
-        const message = 'Input sequence is not DNA or RNA';
+        const message = 'Input sequence is not DNA, please check your sequence.';
         errors.push(message);
     }
     while (pos < sequence.length) {
@@ -178,7 +179,7 @@ function submitSequence(sorted = false) {
         forwardsequence: forwardsequence,
         reversesequence: reversesequence
     });
-    drawChart();
+    // drawChart()
     // Apply options
     const separator = options.separator === 'tabs' ? '\t' : ' ';
     if (options.format === 'fasta') {
@@ -250,6 +251,10 @@ function submitSequence(sorted = false) {
         $('#errorsDiv').css('display', 'block');
         $('#errors').val(errors.join('\n'));
     }
+    else {
+        // Print to table
+        printToTable(forwardsequence);
+    }
     // Print stats
     const stats = [];
     stats.push(`Sequence length: ${sequence.length}`);
@@ -265,8 +270,6 @@ function submitSequence(sorted = false) {
     }
     $('#statsDiv').css('display', 'block');
     $('#stats').val(stats.join('\n'));
-    // Print to table
-    printToTable(forwardsequence);
 }
 function printToTable(forwardsequence) {
     // console.log(forwardsequence)

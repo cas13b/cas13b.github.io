@@ -214,10 +214,11 @@ function submitSequence (sorted:boolean = false): void {
     spacerLength = 1
   }
 
-  if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
+  // if (seq.checkType(sequence, 1) === 'dna' || seq.checkType(sequence, 1) === 'rna') {
+  if (seq.checkType(sequence, 1) === 'dna') {
     // console.log("Sequence is fine, no errors.");
   } else {
-    const message: string = 'Input sequence is not DNA or RNA'
+    const message: string = 'Input sequence is not DNA, please check your sequence.'
     errors.push(message)
   }
 
@@ -235,7 +236,7 @@ function submitSequence (sorted:boolean = false): void {
     forwardsequence: forwardsequence,
     reversesequence: reversesequence
   } as calculatedSequences)
-  drawChart()
+  // drawChart()
 
   // Apply options
   const separator: string = options.separator === 'tabs' ? '\t' : ' '
@@ -310,6 +311,9 @@ function submitSequence (sorted:boolean = false): void {
   if (errors.length > 0) {
     $('#errorsDiv').css('display', 'block')
     $('#errors').val(errors.join('\n'))
+  } else {
+    // Print to table
+    printToTable(forwardsequence)
   }
 
   // Print stats
@@ -327,9 +331,6 @@ function submitSequence (sorted:boolean = false): void {
   $('#statsDiv').css('display', 'block')
   $('#stats').val(stats.join('\n'))
 
-  // Print to table
-
-  printToTable(forwardsequence)
 }
 
 function printToTable(forwardsequence:string[]) {
