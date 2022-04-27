@@ -175,14 +175,13 @@ function submitSequence(sorted = false) {
     // drawChart()
     // Apply options
     const separator = options.separator === 'tabs' ? '\t' : ' ';
-    if (options.format === 'fasta') {
-        forwardsequence = forwardsequence.map((d, i) => `>crRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`);
-        reversesequence = reversesequence.map((d, i) => `>crRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`);
-    }
-    else {
-        forwardsequence = forwardsequence.map((d, i) => `crRNA_${i + 1}_F${separator}${d}`);
-        reversesequence = reversesequence.map((d, i) => `crRNA_${i + 1}_R${separator}${d}`);
-    }
+    // if (options.format === 'fasta') {
+    //   forwardsequence = forwardsequence.map((d, i) => `>crRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
+    //   reversesequence = reversesequence.map((d, i) => `>crRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
+    // } else {
+    forwardsequence = forwardsequence.map((d, i) => `crRNA_${i + 1}${separator}${d}`);
+    //   reversesequence = reversesequence.map((d, i) => `crRNA_${i + 1}_R${separator}${d}`)
+    // }
     // Score output
     if (sorted) {
         // console.log("sorting!");
@@ -196,7 +195,7 @@ function submitSequence(sorted = false) {
             .sort((a, b) => {
             return score(b) - score(a);
         }).map(d => {
-            return `${d} - ${score(d)}`;
+            return `${d} ${score(d)}`;
         });
         // reversesequence = reversesequence.sort((a, b) => {
         //   return score(b) - score(a)
