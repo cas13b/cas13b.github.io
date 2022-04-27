@@ -189,7 +189,10 @@ function submitSequence (sorted:boolean = false): void {
 
   // Calculate sequences
   // Read input
-  const sequence: string = `${$('#fastaSequence').val()}`.toUpperCase().replaceAll(" ", "")
+  const sequence: string = `${$('#fastaSequence').val()}`
+    .toUpperCase()
+    .replaceAll(' ', '')
+    .replaceAll('\n', '')
   const forwardPrimer: string = `${$('#forwardPrimer').val()}`.toLowerCase()
   const reversePrimer: string = `${$('#reversePrimer').val()}`.toLowerCase()
   let spacerLength: number = parseInt(`${$('#spacerLength').val()}`)

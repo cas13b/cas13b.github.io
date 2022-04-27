@@ -135,7 +135,10 @@ function submitSequence(sorted = false) {
     const errors = [];
     // Calculate sequences
     // Read input
-    const sequence = `${$('#fastaSequence').val()}`.toUpperCase().replaceAll(" ", "");
+    const sequence = `${$('#fastaSequence').val()}`
+        .toUpperCase()
+        .replaceAll(' ', '')
+        .replaceAll('\n', '');
     const forwardPrimer = `${$('#forwardPrimer').val()}`.toLowerCase();
     const reversePrimer = `${$('#reversePrimer').val()}`.toLowerCase();
     let spacerLength = parseInt(`${$('#spacerLength').val()}`);
