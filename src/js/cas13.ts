@@ -104,18 +104,23 @@ function markup(seq: string): markedupBase[] {
       color = colors.green
       score = 10
       if (i < 4) {
-        score = 20
+        score = 60
       }
       if (nucleicAcidNotation[goodScore[i]].length > 1) {
         color = colors.yellow
         score = 5
       }
     }
+
     if (nucleicAcidNotation[badScore[i]].includes(char)) {
       color = colors.red
-      score = -10
-      if (i > 4) {
-        score = -5
+      score = -5
+      if (i < 2) {
+        score = -60
+      } else if (i < 3) {
+        score = -50
+      } else if (i < 4) {
+        score = -40
       }
     }
 
