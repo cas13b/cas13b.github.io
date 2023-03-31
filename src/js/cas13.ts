@@ -1,27 +1,27 @@
 const seq = require('bionode-seq')
 
 declare module 'jquery' {
-  export = $;
+  export = $
 }
 
 interface gRNA {
-  x: number;
-  label: string;
-  seq: string;
-  gc: number;
-  type: string;
+  x: number
+  label: string
+  seq: string
+  gc: number
+  type: string
 }
 
 interface calculatedSequences {
-  forwardsequence: string[];
-  reversesequence: string[];
+  forwardsequence: string[]
+  reversesequence: string[]
 }
 
 interface options {
-  strandsShown: string;
-  format: string;
-  lines: string;
-  separator: string;
+  strandsShown: string
+  format: string
+  lines: string
+  separator: string
 }
 
 // const goodScore = 'GGNNNNNNNNNNNNDDDNNNNNNNNNNNNN'.split('');
@@ -32,9 +32,12 @@ let goodScore, badScore, bannedSequences
 
 refreshSequences()
 function refreshSequences() {
-  goodScore = `${$('#goodString').val()}`.replaceAll(" ", "").split('')
-  badScore  = `${$('#badString').val()}`.replaceAll(" ", "").split('')
-  bannedSequences = `${$('#bannedSeq').val()}`.replaceAll(" ", "").split(',').map(s => s.trim())
+  goodScore = `${$('#goodString').val()}`.replaceAll(' ', '').split('')
+  badScore = `${$('#badString').val()}`.replaceAll(' ', '').split('')
+  bannedSequences = `${$('#bannedSeq').val()}`
+    .replaceAll(' ', '')
+    .split(',')
+    .map((s) => s.trim())
 
   $('#goodString').val(goodScore.join(''))
   $('#badString').val(badScore.join(''))
@@ -42,31 +45,31 @@ function refreshSequences() {
 }
 
 function filterBannedSequences(seq: string): boolean {
-  return !bannedSequences.some(banned => seq.includes(banned))
+  return !bannedSequences.some((banned) => seq.includes(banned))
 }
 
 const nucleicAcidNotation = {
-  'A': 'A',
-  'C': 'C',
-  'G': 'G',
-  'T': 'T',
-  'U': 'U',
-  'R': 'AG',
-  'Y': 'CT',
-  'S': 'GC',
-  'W': 'AT',
-  'K': 'GT',
-  'M': 'AC',
-  'B': 'CGT',
-  'D': 'AGT',
-  'H': 'ACT',
-  'V': 'ACG',
-  'N': '',
+  A: 'A',
+  C: 'C',
+  G: 'G',
+  T: 'T',
+  U: 'U',
+  R: 'AG',
+  Y: 'CT',
+  S: 'GC',
+  W: 'AT',
+  K: 'GT',
+  M: 'AC',
+  B: 'CGT',
+  D: 'AGT',
+  H: 'ACT',
+  V: 'ACG',
+  N: '',
   // 'N': 'ACGT',
 }
 
 globalThis.score = score
-function score(seq:string) :number {
+function score(seq: string): number {
   seq = seq.split(' ')[1]
 
   return markup(seq).reduce((result, val) => {
@@ -75,43 +78,43 @@ function score(seq:string) :number {
 }
 
 type markedupBase = {
-  base: string;
-  color: string;
-  score: number;
+  base: string
+  color: string
+  score: number
 }
 
 // Colors generated using https://www.sessions.edu/color-calculator/
 const colors = {
-  'green': '#87cc7a',
-  'yellow': '#f2d666',
-  'red': '#cc7a87',
-  'purple': '#be7acc',
-  'blue': '#6682f2',
-  'white': '#ffffff'
+  green: '#87cc7a',
+  yellow: '#f2d666',
+  red: '#cc7a87',
+  purple: '#be7acc',
+  blue: '#6682f2',
+  white: '#ffffff',
 }
 
 function markup(seq: string): markedupBase[] {
-  const result :markedupBase[] = []
+  const result: markedupBase[] = []
   const seqArray = seq.split('')
   seqArray.forEach((char, i) => {
     var color = colors.white
     let score = 0
 
-    if(nucleicAcidNotation[goodScore[i]].includes(char)) {
+    if (nucleicAcidNotation[goodScore[i]].includes(char)) {
       color = colors.green
       score = 10
-      if(i < 4) {
+      if (i < 4) {
         score = 20
       }
-      if(nucleicAcidNotation[goodScore[i]].length > 1) {
+      if (nucleicAcidNotation[goodScore[i]].length > 1) {
         color = colors.yellow
         score = 5
       }
     }
-    if(nucleicAcidNotation[badScore[i]].includes(char)) {
+    if (nucleicAcidNotation[badScore[i]].includes(char)) {
       color = colors.red
       score = -10
-      if( i > 4 ) {
+      if (i > 4) {
         score = -5
       }
     }
@@ -128,22 +131,26 @@ function markup(seq: string): markedupBase[] {
 
 // Display an example
 globalThis.showExample = showExample
-function showExample (): void {
-  $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
+function showExample(): void {
+  $('#fastaSequence').val(
+    'ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG'
+  )
   $('#spacerLength').val(30)
   $('#forwardPrimer').val('cacc')
   $('#reversePrimer').val('caac')
 }
 
-globalThis.showSortedExample = function():void {
-  $('#fastaSequence').val('ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG')
+globalThis.showSortedExample = function (): void {
+  $('#fastaSequence').val(
+    'ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAAAATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGGACACGAGTAACTCGTCTATCTTCTGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCTAGGTTTCGTCCGGGTGTGACCGAAAGGTAAGATGGAGAGCCTTGTCCCTGGTTTCAACGAGAAAACACACGTCCAACTCAGTTTGCCTGTTTTACAGGTTCGCGACGTGCTCGTACGTGGCTTTGGAGACTCCGTGGAGGAGGTCTTATCAGAGGCACGTCAACATCTTAAAGATGGCACTTGTGGCTTAGTAGAAG'
+  )
   $('#spacerLength').val(30)
-  $('input#showForward').prop('checked', true);
-  submitSequence(true);
+  $('input#showForward').prop('checked', true)
+  submitSequence(true)
 }
 
 globalThis.clearResults = clearResults
-function clearResults (): void {
+function clearResults(): void {
   $('#errorsDiv').css('display', 'none')
   $('#statsDiv').css('display', 'none')
   $('#outputDiv').css('display', 'none')
@@ -162,10 +169,11 @@ function clearResults (): void {
 }
 
 globalThis.getOptions = getOptions
-function getOptions (): options {
-  const data: any = $('form').serializeArray()
+function getOptions(): options {
+  const data: any = $('form')
+    .serializeArray()
     .reduce((result, val) => {
-      (<any>result)[val.name] = val.value
+      ;(<any>result)[val.name] = val.value
       return result
     }, {})
 
@@ -173,14 +181,14 @@ function getOptions (): options {
     strandsShown: data.strandsShown,
     format: data.format,
     lines: data.lines,
-    separator: data.separator
+    separator: data.separator,
   }
 
   return options
 }
 
 globalThis.submitSequence = submitSequence
-function submitSequence (sorted:boolean = false): void {
+function submitSequence(sorted: boolean = false): void {
   clearResults()
   $('#outputDiv').css('display', 'block')
 
@@ -205,8 +213,13 @@ function submitSequence (sorted:boolean = false): void {
 
   if ($('#spacerLength').val() === '') spacerLength = 30
 
-  if ((!Number.isInteger(spacerLength) && $('#spacerLength').val() !== '') || spacerLength < 1 || parseInt(`${$('#spacerLength').val()}`) === 0) {
-    const message: string = "Spacer Length must be an integer 1 or greater, setting 'spacerLength' to 1."
+  if (
+    (!Number.isInteger(spacerLength) && $('#spacerLength').val() !== '') ||
+    spacerLength < 1 ||
+    parseInt(`${$('#spacerLength').val()}`) === 0
+  ) {
+    const message: string =
+      "Spacer Length must be an integer 1 or greater, setting 'spacerLength' to 1."
     errors.push(message)
     spacerLength = 1
   }
@@ -215,14 +228,17 @@ function submitSequence (sorted:boolean = false): void {
   if (seq.checkType(sequence, 1) === 'dna') {
     // console.log("Sequence is fine, no errors.");
   } else {
-    const message: string = 'Input sequence is not DNA, please check your sequence.'
+    const message: string =
+      'Input sequence is not DNA, please check your sequence.'
     errors.push(message)
   }
 
   while (pos < sequence.length) {
     if (pos + spacerLength < sequence.length) {
       const match = sequence.slice(pos, pos + spacerLength)
-      forwardsequence.push(`${forwardPrimer}${seq.reverse(seq.complement(match))}`)
+      forwardsequence.push(
+        `${forwardPrimer}${seq.reverse(seq.complement(match))}`
+      )
       reversesequence.push(`${reversePrimer}${match}`)
     }
     pos++
@@ -231,7 +247,7 @@ function submitSequence (sorted:boolean = false): void {
   // Save sequences to #output for charting purposes
   d3.select('#output').datum({
     forwardsequence: forwardsequence,
-    reversesequence: reversesequence
+    reversesequence: reversesequence,
   } as calculatedSequences)
   // drawChart()
 
@@ -242,12 +258,14 @@ function submitSequence (sorted:boolean = false): void {
   //   forwardsequence = forwardsequence.map((d, i) => `>crRNA_${i + 1}_F\n${d.replace(/.{80}/g, '$0\n')}`)
   //   reversesequence = reversesequence.map((d, i) => `>crRNA_${i + 1}_R\n${d.replace(/.{80}/g, '$0\n')}`)
   // } else {
-    forwardsequence = forwardsequence.map((d, i) => `crRNA_${i + 1}${separator}${d}`)
+  forwardsequence = forwardsequence.map(
+    (d, i) => `crRNA_${i + 1}${separator}${d}`
+  )
   //   reversesequence = reversesequence.map((d, i) => `crRNA_${i + 1}_R${separator}${d}`)
   // }
 
   // Score output
-  if(sorted) {
+  if (sorted) {
     // console.log("sorting!");
     // outputs = outputs.sort((a, b) => {
     //   return score(b) - score(a)
@@ -256,13 +274,13 @@ function submitSequence (sorted:boolean = false): void {
     // })
 
     forwardsequence = forwardsequence
-    .filter(filterBannedSequences)
-    .sort((a, b) => {
-      return score(b) - score(a)
-    }).map(d => {
-      return `${d} ${score(d)}`
-    })
-
+      .filter(filterBannedSequences)
+      .sort((a, b) => {
+        return score(b) - score(a)
+      })
+      .map((d) => {
+        return `${d} ${score(d)}`
+      })
 
     // reversesequence = reversesequence.sort((a, b) => {
     //   return score(b) - score(a)
@@ -318,7 +336,11 @@ function submitSequence (sorted:boolean = false): void {
   stats.push(`Sequence length: ${sequence.length}`)
   stats.push(`GC content: ${countGCcontent(sequence)}%`)
   if (options.strandsShown === 'both') {
-    stats.push(`Number of guide RNAs created: ${forwardsequence.length + reversesequence.length}`)
+    stats.push(
+      `Number of guide RNAs created: ${
+        forwardsequence.length + reversesequence.length
+      }`
+    )
   } else if (options.strandsShown === 'forward') {
     stats.push(`Number of guide RNAs created: ${forwardsequence.length}`)
   } else if (options.strandsShown === 'reverse') {
@@ -327,49 +349,52 @@ function submitSequence (sorted:boolean = false): void {
 
   $('#statsDiv').css('display', 'block')
   $('#stats').val(stats.join('\n'))
-
 }
 
-function printToTable(forwardsequence:string[]) {
+function printToTable(forwardsequence: string[]) {
   // console.log(forwardsequence)
-  d3.select("#outputTable tbody").selectAll("tr")
-  .data(forwardsequence)
-  .enter()
-  .append("tr")
-  .each((data, i, array) => {
-    var tr = d3.select(array[i])
-    var d = data.replace(" - ", " ").split(" ")
-    tr.append("td").text(d[0]);
+  d3.select('#outputTable tbody')
+    .selectAll('tr')
+    .data(forwardsequence)
+    .enter()
+    .append('tr')
+    .each((data, i, array) => {
+      var tr = d3.select(array[i])
+      var d = data.replace(' - ', ' ').split(' ')
+      tr.append('td').text(d[0])
 
-    tr.append("td")
-      .selectAll("mark")
-      .data(markup(d[1]))
-      .enter()
-      .append("mark")
-      .attr("title", d => `Score: ${d.score}`)
-      .style('background', d => d.color)
-      .text(d => d.base)
+      tr.append('td')
+        .selectAll('mark')
+        .data(markup(d[1]))
+        .enter()
+        .append('mark')
+        .attr('title', (d) => `Score: ${d.score}`)
+        .style('background', (d) => d.color)
+        .text((d) => d.base)
 
-    tr.append("td").text(d[2]);
-  })
+      tr.append('td').text(d[2])
+    })
 }
 
 globalThis.updateData = updateData
-function updateData (link: string, data: string): void {
-  $(link).prop('href', `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`)
+function updateData(link: string, data: string): void {
+  $(link).prop(
+    'href',
+    `data:text/plain;charset=utf-8,${encodeURIComponent(`${$(data).val()}`)}`
+  )
 }
 
 globalThis.countGCcontent = countGCcontent
-function countGCcontent (sequence: string): number {
+function countGCcontent(sequence: string): number {
   const total: number = sequence.length
   let gc: number = 0
-  sequence.split('').forEach(char => {
+  sequence.split('').forEach((char) => {
     if (char === 'c' || char === 'C' || char === 'g' || char === 'G') gc++
   })
   return Math.floor((100 * gc) / total)
 }
 
-function updateDisabledOptions (): void {
+function updateDisabledOptions(): void {
   const options: options = getOptions()
 
   if (options.strandsShown === 'both') {
@@ -399,30 +424,36 @@ if (window.location.hash === '#advanced') {
   $('#advancedOptions').removeClass('hidden')
 }
 
-function drawChart (): void {
+function drawChart(): void {
   console.log('Drawing chart')
 
-  const rawData: calculatedSequences = d3.select('#output').datum() as calculatedSequences
+  const rawData: calculatedSequences = d3
+    .select('#output')
+    .datum() as calculatedSequences
   let data: gRNA[] = []
-  data = data.concat(rawData.forwardsequence.map((d, i) => {
-    return {
-      x: i,
-      label: `gRNA_${i + 1}_F`,
-      seq: d,
-      gc: countGCcontent(d),
-      type: 'forward'
-    }
-  }))
+  data = data.concat(
+    rawData.forwardsequence.map((d, i) => {
+      return {
+        x: i,
+        label: `gRNA_${i + 1}_F`,
+        seq: d,
+        gc: countGCcontent(d),
+        type: 'forward',
+      }
+    })
+  )
 
-  data = data.concat(rawData.reversesequence.map((d, i) => {
-    return {
-      x: i,
-      label: `gRNA_${i + 1}_R`,
-      seq: d,
-      gc: countGCcontent(d),
-      type: 'reverse'
-    }
-  }))
+  data = data.concat(
+    rawData.reversesequence.map((d, i) => {
+      return {
+        x: i,
+        label: `gRNA_${i + 1}_R`,
+        seq: d,
+        gc: countGCcontent(d),
+        type: 'reverse',
+      }
+    })
+  )
 
   // set the dimensions and margins of the graph
   const margin = { top: 10, right: 30, bottom: 40, left: 50 }
@@ -431,12 +462,12 @@ function drawChart (): void {
 
   d3.select('#chart g').remove()
   // append the svg object to the body of the page
-  const svg = d3.select('#chart')
+  const svg = d3
+    .select('#chart')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform',
-      'translate(' + margin.left + ',' + margin.top + ')')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
   // Add the grey background that makes ggplot2 famous
   svg
@@ -448,35 +479,49 @@ function drawChart (): void {
     .style('fill', '#EBEBEB')
 
   // Add X axis
-  const x = d3.scaleLinear()
+  const x = d3
+    .scaleLinear()
     .domain([-10, 10 + rawData.forwardsequence.length])
     .range([0, width])
-  svg.append('g')
+  svg
+    .append('g')
     .attr('transform', 'translate(0,' + height + ')')
-    .call(d3.axisBottom(x).tickSize(-height * 1.3).ticks(10))
-    .select('.domain').remove()
+    .call(
+      d3
+        .axisBottom(x)
+        .tickSize(-height * 1.3)
+        .ticks(10)
+    )
+    .select('.domain')
+    .remove()
 
   // Add Y axis
-  const y = d3.scaleLinear()
-    .domain([0, 100])
-    .range([height, 0])
-    .nice()
-  svg.append('g')
-    .call(d3.axisLeft(y).tickSize(-width * 1.3).ticks(7))
-    .select('.domain').remove()
+  const y = d3.scaleLinear().domain([0, 100]).range([height, 0]).nice()
+  svg
+    .append('g')
+    .call(
+      d3
+        .axisLeft(y)
+        .tickSize(-width * 1.3)
+        .ticks(7)
+    )
+    .select('.domain')
+    .remove()
 
   // Customization
   svg.selectAll('.tick line').attr('stroke', 'white')
 
   // Add X axis label:
-  svg.append('text')
+  svg
+    .append('text')
     .attr('text-anchor', 'end')
     .attr('x', width / 2 + margin.left)
     .attr('y', height + margin.top + 20)
     .text('gRNA position')
 
   // Y axis label:
-  svg.append('text')
+  svg
+    .append('text')
     .attr('text-anchor', 'end')
     .attr('transform', 'rotate(-90)')
     .attr('y', -margin.left + 20)
@@ -484,7 +529,8 @@ function drawChart (): void {
     .text('GC content %')
 
   // Color scale: give me a specie name, I return a color
-  const color = d3.scaleOrdinal()
+  const color = d3
+    .scaleOrdinal()
     .domain(['forward', 'reverse', 'average'])
     .range(['#F8766D', '#00BA38', '#619CFF'])
 
@@ -496,17 +542,24 @@ function drawChart (): void {
   let gcContent: d3.Selection<SVGGraphicsElement, {}, HTMLElement, any> = null
 
   // Add dots
-  svg.append('g')
+  svg
+    .append('g')
     .selectAll('dot')
     .data(data)
     .enter()
     .append('circle')
-    .attr('cx', function (d): number { return x(d.x) })
-    .attr('cy', function (d): number { return y(d.gc) })
+    .attr('cx', function (d): number {
+      return x(d.x)
+    })
+    .attr('cy', function (d): number {
+      return y(d.gc)
+    })
     .attr('r', 4)
     .style('opacity', 0.5)
-    .style('fill', function (d: gRNA) { return color(d.type) } as any)
-    .on('mouseover', d => {
+    .style('fill', function (d: gRNA) {
+      return color(d.type)
+    } as any)
+    .on('mouseover', (d) => {
       tooltip.style('display', 'block')
       title.text(d.label)
       sequence.text(d.seq)
@@ -528,41 +581,41 @@ function drawChart (): void {
     })
 
   // Add label
-  tooltip = svg.append('g')
-    .style('display', 'none')
+  tooltip = svg.append('g').style('display', 'none').attrs({
+    id: 'chart-tooltip',
+  })
+  background = tooltip.append('rect').attrs({
+    width: '370px',
+    height: '70px',
+    fill: 'white',
+    stroke: 'black',
+    rx: '5px',
+  })
+  closeButton = tooltip
+    .append('text')
+    .text('X')
     .attrs({
-      id: 'chart-tooltip'
+      x: 355,
+      y: 18,
+      'font-weight': 700,
     })
-  background = tooltip.append('rect')
-    .attrs({
-      width: '370px',
-      height: '70px',
-      fill: 'white',
-      stroke: 'black',
-      rx: '5px'
+    .style('cursor', 'pointer')
+    .on('click', () => {
+      tooltip.style('display', 'none')
     })
-  closeButton = tooltip.append('text').text('X').attrs({
-    x: 355,
-    y: 18,
-    'font-weight': 700
-  }).style('cursor', 'pointer')
-    .on('click', () => { tooltip.style('display', 'none') })
 
-  title = tooltip.append('text').text('title')
-    .attrs({
-      x: 10,
-      y: 20
-    })
-  sequence = tooltip.append('text').text('sequence')
-    .attrs({
-      x: 10,
-      y: 40
-    })
-  gcContent = tooltip.append('text').text('gc Content')
-    .attrs({
-      x: 10,
-      y: 60
-    })
+  title = tooltip.append('text').text('title').attrs({
+    x: 10,
+    y: 20,
+  })
+  sequence = tooltip.append('text').text('sequence').attrs({
+    x: 10,
+    y: 40,
+  })
+  gcContent = tooltip.append('text').text('gc Content').attrs({
+    x: 10,
+    y: 60,
+  })
 }
 
 $('#advancedOptions input').change(() => {
