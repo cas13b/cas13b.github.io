@@ -59,17 +59,18 @@ function markup(seq) {
     seqArray.forEach((char, i) => {
         var color = colors.white;
         let score = 0;
+        // If the char belongs to the good score
+        // colour it green below 4, and yellow otherwise
+        // Green gives a score of +60, yellow +5
         if (nucleicAcidNotation[goodScore[i]].includes(char)) {
-            color = colors.green;
-            score = 10;
+            color = colors.yellow;
+            score = 5;
             if (i < 4) {
+                color = colors.green;
                 score = 60;
             }
-            if (nucleicAcidNotation[goodScore[i]].length > 1) {
-                color = colors.yellow;
-                score = 5;
-            }
         }
+        // If the char belongs to the bad score
         if (nucleicAcidNotation[badScore[i]].includes(char)) {
             color = colors.red;
             score = -5;
