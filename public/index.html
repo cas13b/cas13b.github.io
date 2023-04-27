@@ -15,7 +15,7 @@
     <style>
       #outputTable {
         border-collapse: collapse;
-        font-family:'Courier New', Courier, monospace;
+        font-family: 'Courier New', Courier, monospace;
       }
       #outputTable td,
       #outputTable th {
@@ -26,7 +26,8 @@
         padding: 0.1em 0.4em;
         margin: 0 1px;
       }
-      #advancedOptionsButton, #advancedOptions {
+      #advancedOptionsButton,
+      #advancedOptions {
         display: none;
       }
     </style>
@@ -260,17 +261,13 @@
           </tbody>
         </table>
         <!-- <input type="BUTTON" value="Show Example" onclick="showSortedExample()" /> -->
-        <br>
+        <br />
         <input
           type="BUTTON"
           value="Show Example"
           onclick="showSortedExample()"
         />
-        <input
-          type="BUTTON"
-          value="Submit"
-          onclick="submitSequence(true)"
-        />
+        <input type="BUTTON" value="Submit" onclick="submitSequence(true)" />
         <input type="RESET" value="Clear" onclick="clearResults()" />
       </form>
 
@@ -292,7 +289,12 @@
               >Download as .txt file</a
             >
           </p>
-          <textarea id="output" rows="8" cols="100" style="display: none;"></textarea>
+          <textarea
+            id="output"
+            rows="8"
+            cols="100"
+            style="display: none"
+          ></textarea>
           <table id="outputTable">
             <thead>
               <th>ID</th>
@@ -326,9 +328,13 @@
 
       <br />
       <p>
-        <b>If you are using Cas13-gRNA server in your research, please cite:</b>
+        <b
+          >If you are using this Cas13 crRNA design server in your research,
+          please cite:
+        </b>
         <br />
-        XXXXX, (Under review).
+        'Design principles of PspCas13b for potent and off-target-free RNA
+        silencing' by Hu et al, 2023, (under review).
       </p>
 
       <center>
