@@ -245,7 +245,6 @@
                     id="spacesRadio"
                     name="separator"
                     value="spaces"
-                    checked="true"
                   />
                   <label for="spacesRadio">Spaces</label><br />
                   <input
@@ -253,6 +252,7 @@
                     id="tabsRadio"
                     name="separator"
                     value="tabs"
+                    checked="true"
                   />
                   <label for="tabsRadio">Tabs</label><br />
                 </div>
@@ -281,12 +281,22 @@
           <h2>Output:</h2>
           <p>
             <a
-              id="downloadCsv"
-              onclick="updateData('#downloadCsv', '#output')"
+              id="downloadTsv"
+              onclick="updateData('#downloadTsv', '#output')"
               target="_blank"
-              href="#results.txt"
-              download="results.txt"
-              >Download as .txt file</a
+              href="#results.tsv"
+              download="results.tsv"
+              >Download as .tsv file</a
+            >
+          </p>
+          <p>
+            <a
+              id="downloadFa"
+              onclick="updateData('#downloadFa', '#output')"
+              target="_blank"
+              href="#results.fa"
+              download="results.fa"
+              >Download as .fa file</a
             >
           </p>
           <textarea

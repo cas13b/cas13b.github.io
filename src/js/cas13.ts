@@ -70,7 +70,7 @@ const nucleicAcidNotation = {
 
 globalThis.score = score
 function score(seq: string): number {
-  seq = seq.split(' ')[1]
+  seq = seq.split(/[\s\t]/)[1]
 
   return markup(seq).reduce((result, val) => {
     return result + val.score
@@ -366,7 +366,7 @@ function printToTable(forwardsequence: string[]) {
     .append('tr')
     .each((data, i, array) => {
       var tr = d3.select(array[i])
-      var d = data.replace(' - ', ' ').split(' ')
+      var d = data.replace(' - ', ' ').split(/[\s\t]/)
       tr.append('td').text(d[0])
 
       tr.append('td')
