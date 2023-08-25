@@ -103,7 +103,7 @@ function markup(seq: string): markedupBase[] {
     // If the char belongs to the good score
     // colour it green below 4, and yellow otherwise
     // Green gives a score of +60, yellow +5
-    if (nucleicAcidNotation[goodScore[i]].includes(char)) {
+    if (nucleicAcidNotation[goodScore[i] || "N"].includes(char)) {
       color = colors.yellow
       score = 5
       if (i < 4) {
@@ -113,7 +113,7 @@ function markup(seq: string): markedupBase[] {
     }
 
     // If the char belongs to the bad score
-    if (nucleicAcidNotation[badScore[i]].includes(char)) {
+    if (nucleicAcidNotation[badScore[i] || "N"].includes(char)) {
       color = colors.red
       score = -5
       if (i < 2) {
