@@ -62,7 +62,7 @@ function markup(seq) {
         // If the char belongs to the good score
         // colour it green below 4, and yellow otherwise
         // Green gives a score of +60, yellow +5
-        if (nucleicAcidNotation[goodScore[i] || "N"].includes(char)) {
+        if (nucleicAcidNotation[goodScore[i] || 'N'].includes(char)) {
             color = colors.yellow;
             score = 5;
             if (i < 4) {
@@ -71,7 +71,7 @@ function markup(seq) {
             }
         }
         // If the char belongs to the bad score
-        if (nucleicAcidNotation[badScore[i] || "N"].includes(char)) {
+        if (nucleicAcidNotation[badScore[i] || 'N'].includes(char)) {
             color = colors.red;
             score = -5;
             if (i < 2) {
@@ -291,6 +291,7 @@ function printToTable(forwardsequence) {
         .each((data, i, array) => {
         var tr = d3.select(array[i]);
         var d = data.replace(' - ', ' ').split(/[\s\t]/);
+        tr.attr('id', d[0]);
         tr.append('td').text(d[0]);
         tr.append('td')
             .selectAll('mark')
@@ -301,6 +302,7 @@ function printToTable(forwardsequence) {
             .style('background', (d) => d.color)
             .text((d) => d.base);
         tr.append('td').text(d[2]);
+        tr.append('td').classed('blat', true).datum(d[1]);
     });
 }
 globalThis.updateData = updateData;
@@ -523,3 +525,39 @@ $(document).on('keypress', function (e) {
         d3.select('#chart-tooltip').style('display', 'none');
     }
 });
+globalThis.sendToBlat = function sendToBlat() {
+    console.log('Sending to blat');
+    // console.log(forward)
+    // var data = d3.select('#outputTable tbody')
+    //   .selectAll('td.blat').data()
+    d3.select('#outputTable tbody')
+        .selectAll('tr:nth-child(-n+10) td.blat')
+        .each(function (d, i, array) {
+        var td = d3.select(this);
+        td.text('Loading...');
+        d3.json(`/cors/${d}`).then((result) => {
+            td.text(result.blat);
+            console.log(result);
+        });
+        console.log(d);
+    });
+    // https://genome.ucsc.edu/cgi-bin/hgBlat?userSeq=GGTTTGTTACCTGGGAAGGTATAAACCTTT&type=DNA&db=hg38&output=json
+    // https://genome.ucsc.edu/cgi-bin/hgBlat?userSeq=GGTTTGTTACCTGGGAAGGTATAAACCTTT&type=translated%20RNA&db=hg38&output=json
+};
+// ['matches', 'misMatches', 'repMatches', 'nCount', 'qNumInsert', 'qBaseInsert', 'tNumInsert', 'tBaseInsert', 'strand', 'qName', 'qSize', 'qStart', 'qEnd', 'tName', 'tSize', 'tStart', 'tEnd', 'blockCount', 'blockSizes', 'qStarts', 'tStarts']
+// GTGGACCAAGTAAATGACTCTCTGGTAACAGAATTTGTATTACTTGGACTTGCACAATCC
+// TTGGAAATGCAGTTTTTCCTTTTTCTCTTCTTCTCTTTATTCTATGTGGGAATTATCCTG
+// GGAAAACTCTTCATTGTGTTCACAGTGATCTTTGATCCTCACTTACACTCCCCCATGTAT
+// ATTCTGCTGGCCAACCTATCGCTCATTGACTTGAGCCTTTCATCTACCACAGTTCCTAGG
+// TTGATCTACGATCTTTTTACTGATTGTAAAGTTATTTCCTTCCATAATTGCATGATACAA
+// AAGTTCTTTATCCATGTTATGGGAGGAGTTGAAATGGTGCTGCTGATAGTCATGGCATAT
+// GATAGGTACACTGCGATCTGCAAGCCTCTCCACTATCCAACTATTATGAATCCCAAAATG
+// TGCATGTTTTTGGTAGCAGCAGCTTGGGTCATTGGGGTGATTCATGCTATGTCTCAGTTT
+// GTTTTTGTCATAAATTTACCCTTCTGTGGCCCTAATAATGTGGGGAGCTTTTATTGTGAT
+// TTTCCTCGGGTTATTAAACTTGCATGCATGGACACTTATGGGCTAGAATTTGTGGTCACT
+// GCCAACAGTGGATTCATATCGATGGGCACCTTCTTTTTCTTAATTGTATCATACATTTTT
+// ATTCTGGTCACTGTCCAACGACATTCCTCAAATGATTTATCCAAAGCATTCTTCACTTCG
+// TCGGCTCACATCACCGTAGTGGTTTTGTTTTTTGCTCCATGCATGTTTCTCTACGTGTGG
+// CCTTTCCCTACTAAGTCATTGGATAAATTTTTTGCCATCATGAACTTTGTTGTCACCCCT
+// GTCGTAAATCCTGCCATCTATACTTTAAGGAACAAAGATATGAAGTTTGCAATGAGAAGG
+// CTGAATCAACATATTTTAAATTCTATGGAGACGACATAA
